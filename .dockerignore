@@ -1,0 +1,8 @@
+.env
+env.sample
+.gitignore
+README.md
+tasks
+docker-compose.yml
+README.md
+design

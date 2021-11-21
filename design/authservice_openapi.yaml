@@ -1,0 +1,796 @@
+openapi: 3.0.0
+info:
+  description: Auth service for Yandex Practicum learning project.
+  version: 1.0.0
+  title: AUTH Service
+
+tags:
+- name: Authorization
+  description: Operations about authorization
+- name: Users
+  description: Operations about user
+- name: Roles
+  description: Operations about roles
+- name: Permissions
+  description: Operations about permissions
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    User:
+      type: object
+      properties:
+        username:
+          type: string
+        password:
+          type: string
+
+    CreateUser:
+      type: object
+      properties:
+        username:
+          type: string
+        password:
+          type: string
+        email:
+          type: string
+
+    Error:
+      type: object
+      properties:
+        error_code:
+          type: string
+        message:
+          type: string
+      required:
+        - error_code
+        - message
+
+    Token:
+      type: object
+      properties:
+        access_token:
+          type: string
+        refresh_token:
+          type: string
+
+    AuthEvent:
+      type: object
+      properties:
+        uuid:
+          type: string
+          readOnly: true
+        time:
+          type: integer
+        fingerprint:
+          type: string
+
+    Role:
+      type: object
+      properties:
+        uuid:
+          type: string
+          readOnly: true
+        role_name:
+          type: string
+
+    CreateRole:
+      type: object
+      properties:
+        role_name:
+          type: string
+
+    AssignRole:
+      type: object
+      properties:
+        role_uuid:
+          type: string
+
+    Permission:
+      type: object
+      properties:
+        uuid:
+          type: string
+          readOnly: true
+        permission_name:
+          type: string
+
+    CreatePermission:
+      type: object
+      properties:
+        permission_name:
+          type: string
+
+    AssignPermission:
+      type: object
+      properties:
+        permission_uuid:
+          type: string
+
+    PermissionStatus:
+      type: object
+      properties:
+        user_uuid:
+          type: string
+          readOnly: true
+        permission_uuid:
+          type: string
+          readOnly: true
+        is_permitted:
+          type: boolean
+
+  responses:
+    MinimalResponse:
+      description: OK
+
+    NotFound:
+      description: Not Found
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+
+    Unauthorized:
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+
+    BadRequest:
+      description: Bad Request
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+
+    ImaTeapot:
+      description: Code Execution Error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+
+    InternalError:
+      description: Internal Server Error
+
+paths:
+  /user/signup:
+    post:
+      summary: Create new User with username, password and email
+      tags:
+        - Authorization
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateUser'
+      description: User creation and getting token to access api methods. Takes username, password and email address, returns access token and refresh token.
+      responses:
+        '201':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Token'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '418':
+          $ref: '#/components/responses/ImaTeapot'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /user/auth:
+    post:
+      summary: Authorize User by username and password
+      tags:
+        - Authorization
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+      description: User authorization, takes username and password, returns access and refresh token to use API methods.
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Token'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '418':
+          $ref: '#/components/responses/ImaTeapot'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+    patch:
+      summary: Edit User with new username or password
+      tags:
+        - Authorization
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateUser'
+      description: Edit user login and/or password, email is permanent. Returns access and refresh token.
+      responses:
+        '201':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Token'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '418':
+          $ref: '#/components/responses/ImaTeapot'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+    put:
+      summary: Get new access and refresh token with refresh token sent with Authorization header
+      tags:
+        - Authorization
+#      requestBody: EMPTY HERE
+      description: User authorization, returns access and refresh token using resfresh token. Request Body is not used.
+      responses:
+        '201':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Token'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '418':
+          $ref: '#/components/responses/ImaTeapot'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+    get:
+      summary: Get current User authorization history
+      tags:
+        - Authorization
+      description: Get current User authorization history.
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/AuthEvent'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '418':
+          $ref: '#/components/responses/ImaTeapot'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /user/auth/logout:
+    post:
+      summary: Log out User and destroy refresh token
+      tags:
+        - Authorization
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: '#/components/schemas/Token'
+                - required:
+                    - refresh_token
+      description: Log out and destroy JWT tokens using resfresh token. Returns destroyed access and refresh token.
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Token'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '418':
+          $ref: '#/components/responses/ImaTeapot'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /role:
+    get:
+      summary: Get list of all Roles
+      tags:
+        - Roles
+      description: Get list of all roles. Returns array of Roles.
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Role'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '418':
+          $ref: '#/components/responses/ImaTeapot'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+    post:
+      summary: Create new user Role.
+      tags:
+        - Roles
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateRole'
+      description: Create new user role with role name. Returns created Role.
+      responses:
+        '201':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Role'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '418':
+          $ref: '#/components/responses/ImaTeapot'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /role/{role_id}:
+    parameters:
+      - in: path
+        name: 'role_id'
+        required: true
+        schema:
+          type: string
+
+    patch:
+      summary: Update an existing Role by uuid
+      tags:
+        - Roles
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateRole'
+      description: Update an existing role by uuid with a new name. Returns Role.
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Role'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '418':
+          $ref: '#/components/responses/ImaTeapot'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+    delete:
+      summary: Delete an existing Role by uuid.
+      tags:
+        - Roles
+      description: Delete an existing role by uuid, returns deleted Role.
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Role'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '418':
+          $ref: '#/components/responses/ImaTeapot'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /role/{role_id}/permissions:
+    parameters:
+      - in: path
+        name: 'role_id'
+        required: true
+        schema:
+          type: string
+
+    get:
+      summary: Get all permissions for a Role by uuid.
+      tags:
+        - Roles
+      description: Get list of all permissions for a Role by uuid, returns array of Permissions.
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Permission'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '418':
+          $ref: '#/components/responses/ImaTeapot'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+    post:
+      summary: Assign Permission to the Role
+      tags:
+        - Roles
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AssignPermission'
+      description: Assign Permission to the Role, returns assigned Permission.
+      responses:
+        '201':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Permission'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '418':
+          $ref: '#/components/responses/ImaTeapot'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /role/{role_id}/permissions/{permission_id}:
+    parameters:
+      - in: path
+        name: 'role_id'
+        required: true
+        schema:
+          type: string
+      - in: path
+        name: 'permission_id'
+        required: true
+        schema:
+          type: string
+
+    delete:
+      summary: Remove Permission from Role by uuid.
+      tags:
+        - Roles
+      description: Delete Permission from Role by uuid, returns deleted Permission.
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Permission'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '418':
+          $ref: '#/components/responses/ImaTeapot'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /permission:
+    get:
+      summary: Get list of all Permissions
+      tags:
+        - Permissions
+      description: Get list of all Permissions. Returns array of Permissions.
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Permission'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '418':
+          $ref: '#/components/responses/ImaTeapot'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+    post:
+      summary: Create new Permission with permission name.
+      tags:
+        - Permissions
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreatePermission'
+      description: Create new Permission with name. Return Permission object.
+      responses:
+        '201':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Permission'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '418':
+          $ref: '#/components/responses/ImaTeapot'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /permission/{permission_id}:
+    parameters:
+      - in: path
+        name: 'permission_id'
+        required: true
+        schema:
+          type: string
+
+    patch:
+      summary: Edit Permission by uuid.
+      tags:
+        - Permissions
+      description: Edit permission by uuid. Returns edited Permission.
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreatePermission'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '418':
+          $ref: '#/components/responses/ImaTeapot'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+    delete:
+      summary: Remove Permission by uuid.
+      tags:
+        - Permissions
+      description: Remove Permission by uuid. Returns deleted Permission.
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Permission'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '418':
+          $ref: '#/components/responses/ImaTeapot'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /user/{user_id}/roles:
+    parameters:
+      - in: path
+        name: 'user_id'
+        required: true
+        schema:
+          type: string
+
+    get:
+      summary: Get list of Roles for individual User with uuid
+      tags:
+        - Users
+      description: Get list of Roles for individual User with uuid. Returns array of user Roles.
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Role'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '418':
+          $ref: '#/components/responses/ImaTeapot'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+    post:
+      summary: Assign Role to the individual User with uuid.
+      tags:
+        - Users
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AssignRole'
+      description: Assign Role to the User by uuid, returns assigned Role.
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Role'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '418':
+          $ref: '#/components/responses/ImaTeapot'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /user/{user_id}/roles/{role_id}:
+    parameters:
+      - in: path
+        name: 'user_id'
+        required: true
+        schema:
+          type: string
+      - in: path
+        name: 'role_id'
+        required: true
+        schema:
+          type: string
+
+    delete:
+      summary: Remove Role from the User by uuid
+      tags:
+        - Users
+      description: Remove Role from the User by uuid. Returns deleted Role.
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Role'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '418':
+          $ref: '#/components/responses/ImaTeapot'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /user/{user_id}/permissions:
+    parameters:
+      - in: path
+        name: 'user_id'
+        required: true
+        schema:
+          type: string
+
+    get:
+      summary: Get Permission list of User by uuid
+      tags:
+        - Users
+      description: Get Permission list of User by uuid. Returns array of user Permissions.
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Permission'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '418':
+          $ref: '#/components/responses/ImaTeapot'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /user/{user_id}/permissions/{permission_id}:
+    parameters:
+      - in: path
+        name: 'user_id'
+        required: true
+        schema:
+          type: string
+      - in: path
+        name: 'permission_id'
+        required: true
+        schema:
+          type: string
+
+    get:
+      summary: Check if given User have permission by uuid
+      tags:
+        - Users
+      description: Check if given User have permission by uuid. Returns Permission status object.
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PermissionStatus'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '418':
+          $ref: '#/components/responses/ImaTeapot'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+security:
+  - bearerAuth: []

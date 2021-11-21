@@ -1,0 +1,65 @@
+// Source code for dbdiagram.io service for db design
+
+Table permissions as P {
+  permission_id uuid
+  permission_name text
+}
+
+
+Table roles as R {
+  role_id uuid
+  role_name text
+}
+
+
+Table role_permissions as RP {
+  role_permission_id uuid
+  role_id uuid
+  permission_id uuid
+}
+Ref: RP.role_id > R.role_id
+Ref: RP.permission_id > P.permission_id
+
+
+Table users as U {
+  user_id uuid
+  user_login text
+  user_password text
+  user_email text
+  created_at timestamp [default: `now()`]
+  updated_at timestamp [default: `now()`]
+}
+
+
+Table roles_owners as RO {
+  role_owner_id uuid
+  owner_id uuid
+  role_id uuid
+}
+Ref: RO.owner_id > U.user_id
+Ref: RO.role_id > R.role_id
+
+
+Table auth_events as AE {
+  auth_event_id uuid
+  auth_event_owner_id uuid
+  auth_event_type auth_event_type
+  auth_event_time timestamp [default: `now()`]
+  auth_event_fingerprint text
+}
+Enum auth_event_type {
+  login
+  logout
+}
+Ref: AE.auth_event_owner_id > U.user_id
+
+
+Table tokens as T {
+  token_id uuid
+  token_owner uuid
+  token_value text
+  token_used boolean [default: false]
+  created_at timestamp [default: `now()`]
+  expires_at timestamp [default: `now()+10*24*60*60`]
+}
+Ref: T.token_owner > U.user_id

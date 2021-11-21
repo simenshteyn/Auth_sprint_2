@@ -1,0 +1,83 @@
+version: '3.9'
+
+volumes:
+  postgres_data:
+
+services:
+  pg_db:
+    container_name: pg_db
+    restart: always
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    env_file:
+      - ./.env
+    build:
+      context: .
+      dockerfile: ./pgdatabase/Dockerfile
+    expose:
+      - ${POSTGRES_PORT}
+    healthcheck:
+      test: ["CMD-SHELL", "su postgres", "&&", "pg_isready"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  redis_db:
+    image: 'redis:6.2.6'
+    container_name: redis_db
+    expose:
+      - ${REDIS_PORT}
+    healthcheck:
+      test: ["CMD-SHELL", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    depends_on:
+      pg_db:
+        condition: service_healthy
+
+  auth_app:
+    container_name: auth_app
+    restart: always
+    build:
+      context: .
+      dockerfile: src/Dockerfile
+    env_file:
+      - ./.env
+    logging:
+      options:
+        max-size: 50m
+    ports:
+      - "${SERVICE_PORT}:8000"
+    depends_on:
+      redis_db:
+        condition: service_healthy
+
+
+  app_tests:
+    container_name: app_tests
+    env_file:
+      - ./.env
+    build:
+      context: .
+      dockerfile: tests/Dockerfile
+    command: >
+      sh -c "pytest /app/tests -s -v && flake8 ."
+    depends_on:
+      - auth_app
+    profiles:
+      - testing
+
+  swagger-ui:
+    image: swaggerapi/swagger-ui
+    container_name: swagger_ui_container
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./design:/usr/share/nginx/html/doc
+    environment:
+      API_URL: doc/authservice_openapi.yaml
+    depends_on:
+      - auth_app
+    profiles:
+      - testing
