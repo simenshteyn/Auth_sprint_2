@@ -1,11 +1,13 @@
 from http import HTTPStatus
+from time import sleep
 
 from dependency_injector.wiring import Provide, inject
 from flask import Blueprint, Response, jsonify, make_response, request
 from flask_jwt_extended import get_jwt, jwt_required
 
 from core.containers import Container
-from core.utils import ServiceException, authenticate
+from core.settings import config
+from core.utils import ServiceException, authenticate, rate_limit
 from models.permission import Permission
 from models.role import Role
 from services.user import UserService
@@ -91,6 +93,7 @@ def refresh(user_service: UserService = Provide[Container.user_service]):
 @user.route('/auth/logout', methods=["POST"])
 @jwt_required()
 @authenticate()
+@rate_limit(config.user_max_request_rate)
 @inject
 def logout(user_id: str,
            user_service: UserService = Provide[Container.user_service]):
@@ -114,6 +117,7 @@ def logout(user_id: str,
 @user.route('/auth', methods=["PATCH"])
 @jwt_required()
 @authenticate()
+@rate_limit(config.user_max_request_rate)
 @inject
 def modify(
         user_id: str,
@@ -134,6 +138,7 @@ def modify(
 @user.route('/auth', methods=["GET"])
 @jwt_required()
 @authenticate()
+@rate_limit(config.user_max_request_rate)
 @inject
 def auth_history(user_id: str,
                  user_service: UserService = Provide[Container.user_service]
@@ -246,3 +251,18 @@ def check_user_perm(
     return jsonify(user_uuid=user_uuid,
                    permission_uuid=perm_uuid,
                    is_permitted=is_permitted)
+
+
+@user.route('/slow', methods=['GET'])
+@jwt_required()
+@authenticate()
+@rate_limit(config.user_max_request_rate)
+def slow(user_id: str):
+    """Stub handle used for testing rate limiting
+    in tests/functional/src/test_rate_limit.py """
+
+    sleep(1)
+
+    return make_response(
+        jsonify(slept=1), HTTPStatus.OK
+    )

@@ -5,7 +5,8 @@ from flask import Blueprint, Response, jsonify, make_response, request
 from flask_jwt_extended import jwt_required
 
 from core.containers import Container
-from core.utils import ServiceException, authenticate
+from core.settings import config
+from core.utils import ServiceException, authenticate, rate_limit
 from services.permission import PermissionService
 
 permission = Blueprint('permission', __name__, url_prefix='/permission')
@@ -14,6 +15,7 @@ permission = Blueprint('permission', __name__, url_prefix='/permission')
 @permission.route('/', methods=['GET'])
 @jwt_required()
 @authenticate()
+@rate_limit(config.user_max_request_rate)
 @inject
 def get_permissions(
         user_id: str,
@@ -31,6 +33,7 @@ def get_permissions(
 @permission.route('/', methods=['POST'])
 @jwt_required()
 @authenticate()
+@rate_limit(config.user_max_request_rate)
 @inject
 def create_permission(
         user_id: str,
@@ -56,6 +59,7 @@ def create_permission(
 @permission.route('/<uuid:perm_uuid>', methods=['PATCH'])
 @jwt_required()
 @authenticate()
+@rate_limit(config.user_max_request_rate)
 @inject
 def edit_permission(user_id: str, perm_uuid: str,
                     perm_service: PermissionService = Provide[
@@ -81,6 +85,7 @@ def edit_permission(user_id: str, perm_uuid: str,
 @permission.route('/<uuid:perm_uuid>', methods=['DELETE'])
 @jwt_required()
 @authenticate()
+@rate_limit(config.user_max_request_rate)
 @inject
 def delete_permission(user_id: str, perm_uuid: str,
                       perm_service: PermissionService = Provide[

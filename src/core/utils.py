@@ -61,3 +61,29 @@ def authenticate():
         return decorator
 
     return wrapper
+
+
+def rate_limit(max_rate):
+    def wrapper(fn):
+        @wraps(fn)
+        def decorator(*args, **kwargs):
+            # Only imposing the limits on user-identified requests
+            if 'user_id' not in kwargs:
+                return fn(*args, **kwargs)  # pragma: no cover
+
+            key = f"buffer:{kwargs['user_id']}"
+            buffer_size = redis.incr(key, 1)
+            if buffer_size > 10:
+                redis.decr(key)
+                return make_response(
+                    jsonify(error_code='TOO_MANY_REQUESTS',
+                            message='API rate limit exceeded'),
+                    HTTPStatus.TOO_MANY_REQUESTS
+                )
+            result = fn(*args, **kwargs)  # pragma: no cover
+            redis.decr(key)
+            return result
+
+        return decorator
+
+    return wrapper
