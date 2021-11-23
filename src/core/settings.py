@@ -20,6 +20,7 @@ class AppSettings(BaseSettings):
     access_token_expiration: int
     jwt_secret_key: str
     cache_time: int
+    user_max_request_rate: int
 
 
 app_settings = {
@@ -38,6 +39,7 @@ app_settings = {
     'service_admin_role': os.getenv('SERVICE_ADMIN_ROLE'),
     'access_token_expiration': os.getenv('ACCESS_TOKEN_EXPIRATION'),
     'jwt_secret_key': os.getenv('JWT_SECRET_KEY'),
-    'cache_time': os.getenv('CACHE_TIME')
+    'cache_time': os.getenv('CACHE_TIME'),
+    'user_max_request_rate': os.getenv('USER_MAX_REQUEST_RATE')
 }
 config = AppSettings.parse_obj(app_settings)

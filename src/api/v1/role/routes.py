@@ -5,7 +5,8 @@ from flask import Blueprint, Response, jsonify, make_response, request
 from flask_jwt_extended import jwt_required
 
 from core.containers import Container
-from core.utils import ServiceException, authenticate
+from core.settings import config
+from core.utils import ServiceException, authenticate, rate_limit
 from models.permission import Permission
 from services.role import RoleService
 
@@ -15,6 +16,7 @@ role = Blueprint('role', __name__, url_prefix='/role')
 @role.route('/', methods=['GET'])
 @jwt_required()
 @authenticate()
+@rate_limit(config.user_max_request_rate)
 @inject
 def get_roles(
         user_id: str,
@@ -32,6 +34,7 @@ def get_roles(
 @role.route('/', methods=['POST'])
 @jwt_required()
 @authenticate()
+@rate_limit(config.user_max_request_rate)
 @inject
 def create_role(
         user_id: str,
@@ -54,6 +57,7 @@ def create_role(
 @role.route('/<uuid:role_uuid>', methods=['PATCH'])
 @jwt_required()
 @authenticate()
+@rate_limit(config.user_max_request_rate)
 @inject
 def edit_role(user_id: str, role_uuid: str,
               role_service: RoleService = Provide[Container.role_service]):
@@ -78,6 +82,7 @@ def edit_role(user_id: str, role_uuid: str,
 @role.route('/<uuid:role_uuid>', methods=['DELETE'])
 @jwt_required()
 @authenticate()
+@rate_limit(config.user_max_request_rate)
 @inject
 def delete_role(user_id: str, role_uuid: str,
                 role_service: RoleService = Provide[Container.role_service]):
@@ -95,6 +100,7 @@ def delete_role(user_id: str, role_uuid: str,
 @role.route('/<uuid:role_uuid>/permissions', methods=['GET'])
 @jwt_required()
 @authenticate()
+@rate_limit(config.user_max_request_rate)
 @inject
 def get_role_permissions(
         user_id: str,
@@ -113,6 +119,7 @@ def get_role_permissions(
 @role.route('/<uuid:role_uuid>/permissions', methods=['POST'])
 @jwt_required()
 @authenticate()
+@rate_limit(config.user_max_request_rate)
 @inject
 def set_role_permissions(
         user_id: str,
@@ -139,6 +146,7 @@ def set_role_permissions(
             methods=['DELETE'])
 @jwt_required()
 @authenticate()
+@rate_limit(config.user_max_request_rate)
 @inject
 def remove_role_permissions(
         user_id: str,
