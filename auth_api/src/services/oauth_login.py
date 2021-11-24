@@ -15,7 +15,7 @@ class OauthService(BaseService):
         oauth = OAuthSignIn.get_provider(provider)
         return oauth.authorize()
 
-    def login(self, provider):
+    def _social_login(self, provider):
         """Method to login existing user with social account. """
         oauth = OAuthSignIn.get_provider(provider)
         social_id, social_name, email = oauth.callback()
@@ -66,5 +66,15 @@ class OauthService(BaseService):
             return access_token, refresh_token
 
         # If we can't find user by social account and email from provider
-        raise ServiceException(error_code=self.USER_NOT_FOUND.code,
-                               message=self.USER_NOT_FOUND.message)
+        return None, None
+
+    def login(self, provider):
+        try:
+            access_token, refresh_token = self._social_login(provider)
+        except ServiceException as e:
+            raise ServiceException(error_code=e.error_code,
+                                   message=e.message)
+        if not access_token:
+            raise ServiceException(error_code='SOCIAL_NOT_FOUND',
+                                   message='Social ID not found. Signup first')
+        return access_token, refresh_token
