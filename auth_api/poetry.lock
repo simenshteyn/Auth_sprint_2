@@ -520,6 +520,17 @@ Werkzeug = ">=0.7"
 docs = ["sphinx", "sphinx-rtd-theme"]
 
 [[package]]
+name = "rauth"
+version = "0.7.3"
+description = "A Python library for OAuth 1.0/a, 2.0, and Ofly."
+category = "main"
+optional = false
+python-versions = "*"
+
+[package.dependencies]
+requests = ">=1.2.3"
+
+[[package]]
 name = "redis"
 version = "3.5.3"
 description = "Python client for Redis key-value store"
@@ -668,7 +679,7 @@ testing = ["coverage (>=5.0.3)", "zope.event", "zope.testing"]
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.9"
-content-hash = "26644048f51ccc500fc6ee45aa7a5748791f3a8dfcdb15d29e61c3415ec4f3f0"
+content-hash = "e9ac1a794e8676624a2c95c0e142bacd2174d8748aec19514333b8127893ebd9"
 
 [metadata.files]
 aiohttp = [
@@ -1333,6 +1344,10 @@ pytest-asyncio = [
 pytest-flask = [
     {file = "pytest-flask-1.2.0.tar.gz", hash = "sha256:46fde652f77777bf02dc91205aec4ce20cdf2acbbbd66a918ab91f5c14693d3d"},
     {file = "pytest_flask-1.2.0-py3-none-any.whl", hash = "sha256:fe25b39ad0db09c3d1fe728edecf97ced85e774c775db259a6d25f0270a4e7c9"},
+]
+rauth = [
+    {file = "rauth-0.7.3-py2-none-any.whl", hash = "sha256:b18590fbd77bc3d871936bbdb851377d1b0c08e337b219c303f8fc2b5a42ef2d"},
+    {file = "rauth-0.7.3.tar.gz", hash = "sha256:524cdbc1c28560eacfc9a9d40c59525eb8d00fdf07fbad86107ea24411477b0a"},
 ]
 redis = [
     {file = "redis-3.5.3-py2.py3-none-any.whl", hash = "sha256:432b788c4530cfe16d8d943a09d40ca6c16149727e4afe8c2c9d5580c59d9f24"},
