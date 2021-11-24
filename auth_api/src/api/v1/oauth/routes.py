@@ -24,7 +24,7 @@ def oauth_authorize(
     return oauth_service.authorize(provider)
 
 
-@oauth.route('/callback/<provider>')
+@oauth.route('/login/callback/<provider>')
 @inject
 def oauth_callback(
         provider: str,

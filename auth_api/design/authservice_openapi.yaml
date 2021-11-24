@@ -348,7 +348,7 @@ paths:
         '500':
           $ref: '#/components/responses/InternalError'
 
-  /oauth/callback/{provider}:
+  /oauth/login/callback/{provider}:
     get:
       parameters:
         - in: path
