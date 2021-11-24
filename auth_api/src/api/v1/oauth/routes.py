@@ -1,6 +1,9 @@
+from dependency_injector.wiring import inject, Provide
 from flask import Blueprint, jsonify
 
-from services.oauth import OAuthSignIn
+from core.containers import Container
+
+from services.oauth_login import OauthService
 
 oauth = Blueprint('oauth', __name__, url_prefix='/oauth')
 
@@ -11,16 +14,17 @@ def oauth_index():
 
 
 @oauth.route('/login/<provider>')
-def oauth_authorize(provider):
-    oauth = OAuthSignIn.get_provider(provider)
-    return oauth.authorize()
+@inject
+def oauth_authorize(
+        provider: str,
+        oauth_service: OauthService = Provide[Container.oauth_service]):
+    return oauth_service.authorize(provider)
 
 
 @oauth.route('/callback/<provider>')
-def oauth_callback(provider):
-    oauth = OAuthSignIn.get_provider(provider)
-    social_id, social_name, email = oauth.callback()
-    result = {'social_id': social_id,
-              'social_name': social_name,
-              'email': email}
+@inject
+def oauth_callback(
+        provider: str,
+        oauth_service: OauthService = Provide[Container.oauth_service]):
+    result = oauth_service.get_info(provider)
     return jsonify(result)

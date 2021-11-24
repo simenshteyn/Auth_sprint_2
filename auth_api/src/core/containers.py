@@ -7,6 +7,7 @@ from services.role import RoleService
 from services.user import UserService
 from services.user_perms import UserPermsService
 from services.user_role import UserRoleService
+from services.oauth_login import OauthService
 
 
 class Container(containers.DeclarativeContainer):
@@ -18,6 +19,7 @@ class Container(containers.DeclarativeContainer):
             'api.v1.user.routes',
             'api.v1.role.routes',
             'api.v1.permission.routes',
+            'api.v1.oauth.routes',
             'core.commands'
         ],
     )
@@ -27,3 +29,4 @@ class Container(containers.DeclarativeContainer):
     perm_service = providers.Factory(PermissionService)
     user_role_service = providers.Factory(UserRoleService)
     user_perm_service = providers.Factory(UserPermsService)
+    oauth_service = providers.Factory(OauthService)
