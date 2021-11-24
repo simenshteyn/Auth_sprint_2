@@ -39,7 +39,7 @@ class BaseService:
     ACCESS_TOKEN_EXPIRED = Rcode('ACCESS_TOKEN_EXPIRED',
                                  'Access token has expired')
     WRONG_CALLBACK = Rcode('WRONG_CALLBACK',
-                         'Code or callback from social service is broken')
+                           'Code or callback from social service is broken')
 
     def __init__(self):
         pass

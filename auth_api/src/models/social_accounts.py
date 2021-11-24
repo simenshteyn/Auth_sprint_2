@@ -1,5 +1,6 @@
 from dataclasses import dataclass
 
+from pydantic import BaseModel
 from sqlalchemy import DefaultClause, text
 from sqlalchemy.dialects.postgresql import UUID
 
@@ -25,3 +26,11 @@ class SocialAccount(db.Model):
     )
     social_id: str = db.Column(db.String, nullable=False)
     social_provider: str = db.Column(db.String, nullable=False)
+
+
+class SocialSignupResult(BaseModel):
+    username: str
+    password: str
+    email: str
+    access_token: str
+    refresh_token: str
