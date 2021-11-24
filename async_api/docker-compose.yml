@@ -1,0 +1,34 @@
+version: "3"
+services:
+    async_api:
+        build:
+            context: ./src
+        image: videoserv-async-api:1.0.0
+        ports:
+            - 8888:8888
+        environment:
+            - ELASTIC_HOST=elasticsearch
+            - ELASTIC_PORT=9200
+            - REDIS_HOST=redis
+            - REDIS_PORT=6379
+        working_dir: /opt/async_api
+        command: >
+            gunicorn main:app
+                --bind '0.0.0.0:8888'
+                --worker-tmp-dir /dev/shm
+                --workers 2
+                --threads 4
+                --worker-class uvicorn.workers.UvicornWorker
+                --log-level info
+    async_api_nginx:
+        build:
+            context: ./nginx
+        image: videoserv-async-api-nginx:1.0.0
+        ports:
+            - 8080:8080
+        depends_on:
+            - async_api
+networks:
+    default:
+        external:
+            name: videoserv_net

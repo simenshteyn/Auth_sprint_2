@@ -1,0 +1,13 @@
+__pycache__/
+.mypy_cache/
+.pytest_cache/
+
+# IDEs
+.idea/
+.vscode/
+
+# "venv" variants
+.venv
+.env
+venv/
+env/

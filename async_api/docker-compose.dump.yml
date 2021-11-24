@@ -1,0 +1,47 @@
+version: "3"
+services:
+    load_elastic_dump:
+        build:
+            context: ./
+            dockerfile: ./elasticsearch/Dockerfile.dump
+        image: videoserv-elastic-dump
+        volumes:
+            - ./tests/functional/testdata:/opt/data
+        working_dir: /opt/data
+        command: sh -c "
+            until $$(curl --output /dev/null --silent --fail http://elasticsearch:9200); do printf '.'; sleep 2; done &&
+            curl -XDELETE http://elasticsearch:9200/movies &&
+            curl -XPUT http://elasticsearch:9200/movies
+                -H 'Content-Type:application/json'
+                -d '@movies_index.json' &&
+            elasticdump
+                --retryAttempts 2
+                --retryDelay 5
+                --type data
+                --input movies_data.json
+                --output http://elasticsearch:9200/movies &&
+            curl -XDELETE http://elasticsearch:9200/persons &&
+            curl -XPUT http://elasticsearch:9200/persons
+                -H 'Content-Type:application/json'
+                -d '@persons_index.json' &&
+            elasticdump
+                --retryAttempts 2
+                --retryDelay 5
+                --type data
+                --input persons_data.json
+                --output http://elasticsearch:9200/persons &&
+            curl -XDELETE http://elasticsearch:9200/genres &&
+            curl -XPUT http://elasticsearch:9200/genres
+            -H 'Content-Type:application/json'
+            -d '@genres_index.json' &&
+            elasticdump
+                --retryAttempts 2
+                --retryDelay 5
+                --type data
+                --input genres_data.json
+                --output http://elasticsearch:9200/genres"
+
+networks:
+    default:
+        external:
+            name: videoserv_net

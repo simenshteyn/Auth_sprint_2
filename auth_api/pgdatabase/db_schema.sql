@@ -13,17 +13,31 @@ CREATE TABLE IF NOT EXISTS app.users (
     user_email              text        NOT NULL,
     created_at              timestamp with time zone DEFAULT (now()),
     updated_at              timestamp with time zone DEFAULT (now())
-) partition by hash(user_id);
-create table app.users_0 partition of app.users for values with (modulus 10, remainder 0);
-create table app.users_1 partition of app.users for values with (modulus 10, remainder 1);
-create table app.users_2 partition of app.users for values with (modulus 10, remainder 2);
-create table app.users_3 partition of app.users for values with (modulus 10, remainder 3);
-create table app.users_4 partition of app.users for values with (modulus 10, remainder 4);
-create table app.users_5 partition of app.users for values with (modulus 10, remainder 5);
-create table app.users_6 partition of app.users for values with (modulus 10, remainder 6);
-create table app.users_7 partition of app.users for values with (modulus 10, remainder 7);
-create table app.users_8 partition of app.users for values with (modulus 10, remainder 8);
-create table app.users_9 partition of app.users for values with (modulus 10, remainder 9);
+) partition by list(extract('hour' from created_at));
+create table app.users_0 partition of app.users for values in (0);
+create table app.users_0 partition of app.users for values in (1);
+create table app.users_0 partition of app.users for values in (2);
+create table app.users_0 partition of app.users for values in (3);
+create table app.users_0 partition of app.users for values in (4);
+create table app.users_0 partition of app.users for values in (5);
+create table app.users_0 partition of app.users for values in (6);
+create table app.users_0 partition of app.users for values in (7);
+create table app.users_0 partition of app.users for values in (8);
+create table app.users_0 partition of app.users for values in (9);
+create table app.users_0 partition of app.users for values in (10);
+create table app.users_0 partition of app.users for values in ;
+create table app.users_0 partition of app.users for values in (0);
+create table app.users_0 partition of app.users for values in (0);
+create table app.users_0 partition of app.users for values in (0);
+create table app.users_0 partition of app.users for values in (0);
+create table app.users_0 partition of app.users for values in (0);
+create table app.users_0 partition of app.users for values in (0);
+create table app.users_0 partition of app.users for values in (0);
+create table app.users_0 partition of app.users for values in (0);
+create table app.users_0 partition of app.users for values in (0);
+create table app.users_0 partition of app.users for values in (0);
+create table app.users_0 partition of app.users for values in (0);
+create table app.users_0 partition of app.users for values in (0);
 
 
 CREATE TABLE IF NOT EXISTS app.auth_events (
