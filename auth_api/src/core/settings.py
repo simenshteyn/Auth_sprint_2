@@ -21,6 +21,8 @@ class AppSettings(BaseSettings):
     jwt_secret_key: str
     cache_time: int
     user_max_request_rate: int
+    oauth_vk_id: str
+    oauth_vk_secret: str
 
 
 app_settings = {
@@ -40,6 +42,8 @@ app_settings = {
     'access_token_expiration': os.getenv('ACCESS_TOKEN_EXPIRATION'),
     'jwt_secret_key': os.getenv('JWT_SECRET_KEY'),
     'cache_time': os.getenv('CACHE_TIME'),
-    'user_max_request_rate': os.getenv('USER_MAX_REQUEST_RATE')
+    'user_max_request_rate': os.getenv('USER_MAX_REQUEST_RATE'),
+    'oauth_vk_id': os.getenv('OAUTH_VK_ID'),
+    'oauth_vk_secret': os.getenv('OAUTH_VK_SECRET')
 }
 config = AppSettings.parse_obj(app_settings)
