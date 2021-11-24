@@ -261,7 +261,7 @@ def slow(user_id: str):
     """Stub handle used for testing rate limiting
     in tests/functional/src/test_rate_limit.py """
 
-    sleep(1)
+    sleep(5)
 
     return make_response(
         jsonify(slept=1), HTTPStatus.OK
