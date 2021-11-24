@@ -1,7 +1,10 @@
+from http import HTTPStatus
+
 from dependency_injector.wiring import inject, Provide
-from flask import Blueprint, jsonify
+from flask import Blueprint, jsonify, make_response
 
 from core.containers import Container
+from core.utils import ServiceException
 
 from services.oauth_login import OauthService
 
@@ -26,5 +29,11 @@ def oauth_authorize(
 def oauth_callback(
         provider: str,
         oauth_service: OauthService = Provide[Container.oauth_service]):
-    result = oauth_service.get_info(provider)
-    return jsonify(result)
+    try:
+        access_token, refresh_token = oauth_service.login(provider)
+    except ServiceException as err:
+        return make_response(jsonify(err), HTTPStatus.BAD_REQUEST)
+
+    return make_response(
+        jsonify(access_token=access_token, refresh_token=refresh_token),
+        HTTPStatus.OK)

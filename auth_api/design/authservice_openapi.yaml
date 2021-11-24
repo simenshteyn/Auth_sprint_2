@@ -319,6 +319,70 @@ paths:
         '500':
           $ref: '#/components/responses/InternalError'
 
+  /oauth/login/{provider}:
+    get:
+      parameters:
+        - in: path
+          name: provider
+          required: true
+          schema:
+            type: string
+          description: Name of OAuth social provider, for example 'vk'
+      summary: Authorize User by OAuth with social provider
+      tags:
+        - Authorization
+      description: User authorization via OAuth, redirects to provider site, then returns access and refresh token on to use API methods.
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Token'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '418':
+          $ref: '#/components/responses/ImaTeapot'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /oauth/callback/{provider}:
+    get:
+      parameters:
+        - in: path
+          name: provider
+          required: true
+          schema:
+            type: string
+          description: Name of OAuth social provider, for example 'vk'
+        - in: query
+          name: code
+          required: true
+          schema:
+            type: string
+          description: Code to get access token and user credentials from OAuth social provider
+      summary: Callback to aquire code from social provider
+      tags:
+        - Authorization
+      description: User authorization via OAuth, returns access and refresh token to use API methods.
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Token'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '418':
+          $ref: '#/components/responses/ImaTeapot'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
   /role:
     get:
       summary: Get list of all Roles

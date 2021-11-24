@@ -63,14 +63,17 @@ class VkSignIn(OAuthSignIn):
 
         if 'code' not in request.args:
             return None, None, None
-        oauth_session = self.service.get_auth_session(
-            method='GET', params={
-                'client_id': self.consumer_id,
-                'client_secret': self.consumer_secret,
-                'redirect_uri': self.get_callback_url(),
-                'code': request.args['code']
-            }, decoder=decode_json)
-        response = oauth_session.access_token_response.json()
-        return (response.get('user_id'),
+        try:
+            oauth_session = self.service.get_auth_session(
+                method='GET', params={
+                    'client_id': self.consumer_id,
+                    'client_secret': self.consumer_secret,
+                    'redirect_uri': self.get_callback_url(),
+                    'code': request.args['code']
+                }, decoder=decode_json)
+            response = oauth_session.access_token_response.json()
+        except Exception:
+            return None, None, None
+        return (str(response.get('user_id')),
                 self.provider_name,
                 response.get('email'))
