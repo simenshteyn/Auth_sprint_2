@@ -23,6 +23,7 @@ class AppSettings(BaseSettings):
     user_max_request_rate: int
     oauth_vk_id: str
     oauth_vk_secret: str
+    vk_api_version: str
 
 
 app_settings = {
@@ -44,6 +45,7 @@ app_settings = {
     'cache_time': os.getenv('CACHE_TIME'),
     'user_max_request_rate': os.getenv('USER_MAX_REQUEST_RATE'),
     'oauth_vk_id': os.getenv('OAUTH_VK_ID'),
-    'oauth_vk_secret': os.getenv('OAUTH_VK_SECRET')
+    'oauth_vk_secret': os.getenv('OAUTH_VK_SECRET'),
+    'vk_api_version': os.getenv('VK_API_VERSION')
 }
 config = AppSettings.parse_obj(app_settings)
