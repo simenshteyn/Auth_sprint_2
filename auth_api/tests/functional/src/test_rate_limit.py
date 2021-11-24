@@ -53,7 +53,9 @@ async def test_rate_limit(
         pytest.fail(f"Failed make {max_rate} parallel requests")
 
     if stats[HTTPStatus.OK] > max_rate:
-        pytest.fail(f"Exceeded the rate of {max_rate} parallel requests")
+        pytest.fail(
+            f'Exceeded the rate of {max_rate} parallel'
+            f'requests with {stats[HTTPStatus.OK]} requests')
 
     assert stats[HTTPStatus.TOO_MANY_REQUESTS] == overflow, \
         "Wrong number of 429 responses"
