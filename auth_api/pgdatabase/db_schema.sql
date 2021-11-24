@@ -94,6 +94,18 @@ CREATE TABLE IF NOT EXISTS app.roles_owners (
             ON UPDATE CASCADE
 );
 
+CREATE TABLE IF NOT EXISTS app.social_accounts (
+    social_account_id       uuid        PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id                 uuid        NOT NULL,
+    social_id               text        NOT NULL,
+    social_provider         text        NOT NULL,
+     UNIQUE (social_id, social_provider),
+    FOREIGN KEY (user_id)
+            REFERENCES app.users(user_id)
+            ON DELETE CASCADE
+            ON UPDATE CASCADE
+);
+
 CREATE INDEX ON app.users(user_login);
 
 CREATE INDEX ON app.users(user_email);
