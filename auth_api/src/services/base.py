@@ -38,6 +38,8 @@ class BaseService:
     EMAIL_EXISTS = Rcode('EMAIL_EXISTS', 'This email address is already used')
     ACCESS_TOKEN_EXPIRED = Rcode('ACCESS_TOKEN_EXPIRED',
                                  'Access token has expired')
+    WRONG_CALLBACK = Rcode('WRONG_CALLBACK',
+                           'Code or callback from social service is broken')
 
     def __init__(self):
         pass

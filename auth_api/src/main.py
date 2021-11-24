@@ -13,6 +13,12 @@ def create_app():
     app.container = container
     app.config['SQLALCHEMY_DATABASE_URI'] = PG_URI
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+    app.config['OAUTH_CREDENTIALS'] = {
+        'vk': {
+            'id': config.oauth_vk_id,
+            'secret': config.oauth_vk_secret
+        }
+    }
     db.init_app(app)
     app.register_blueprint(api, url_prefix='/api')
     app.register_blueprint(commands)

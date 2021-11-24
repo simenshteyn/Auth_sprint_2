@@ -64,3 +64,7 @@ def test_db_table_role_permissions_exists(pg_curs):
 
 def test_db_table_roles_owners_exists(pg_curs):
     assert table_exists(pg_curs, 'role_owner_id', 'roles_owners')
+
+
+def test_db_table_social_accounts_exists(pg_curs):
+    assert table_exists(pg_curs, 'social_account_id', 'social_accounts')
