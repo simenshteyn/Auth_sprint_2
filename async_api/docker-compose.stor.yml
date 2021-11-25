@@ -1,0 +1,27 @@
+version: "3"
+services:
+    elasticsearch:
+        build:
+            context: ./elasticsearch
+        image: videoserv-elasticsearch:1.0.0
+        ports:
+            - ${ELASTIC_PORT:-9200}:9200
+        environment:
+            - logger.level=WARN
+        volumes:
+            - esdata:/usr/share/elasticsearch/data
+    redis:
+        build:
+            context: ./redis
+        image: videoserv-redis:1.0.0
+        ports:
+            - ${REDIS_PORT:-6379}:6379
+        volumes:
+            - redisdata:/data
+volumes:
+    esdata:
+    redisdata:
+networks:
+    default:
+        external:
+            name: videoserv_net
