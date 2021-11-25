@@ -196,6 +196,23 @@ def get_user_roles_list(
     return jsonify(result)
 
 
+@user.route('/roles', methods=['GET'])
+@jwt_required()
+@authenticate()
+@inject
+def get_curren_user_roles_list(
+        user_id: str,
+        user_role_service: UserRoleService = Provide[
+            Container.user_role_service]):
+    try:
+        roles_list = user_role_service.get_user_roles_list(user_id)
+    except ServiceException as err:
+        return make_response(jsonify(err), HTTPStatus.BAD_REQUEST)
+    result = [{'uuid': role.role_id,
+               'role_name': role.role_name} for role in roles_list]
+    return jsonify(result)
+
+
 @user.route('/<uuid:user_uuid>/roles/<uuid:role_uuid>', methods=['DELETE'])
 @jwt_required()
 @authenticate()

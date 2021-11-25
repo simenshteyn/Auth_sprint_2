@@ -224,6 +224,15 @@ async def test_user_role_assigment(make_post_request, make_get_request,
     assert len(assigned_roles) == 1
     assert assigned_roles[0].role_name == 'testing_role'
 
+    # Get assigned roles for current created user by his token TODO
+    response = await make_get_request(
+        'user/roles',
+        headers=get_auth_headers(tokens.access_token))
+    assigned_roles = await extract_roles(response)
+    assert response.status == HTTPStatus.OK
+    assert len(assigned_roles) == 1
+    assert assigned_roles[0].role_name == 'testing_role'
+
     # Get permissions list for created user
     response = await make_get_request(f'user/{user_uuid}/permissions',
                                       headers=get_auth_headers(access_token))
