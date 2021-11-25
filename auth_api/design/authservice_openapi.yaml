@@ -768,6 +768,33 @@ paths:
         '500':
           $ref: '#/components/responses/InternalError'
 
+  /user/roles:
+    get:
+      summary: Get list of Roles for current User with token
+      tags:
+        - Users
+      description: Get list of Roles for current User with token. Returns array of user Roles.
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Role'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '418':
+          $ref: '#/components/responses/ImaTeapot'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+
   /user/{user_id}/roles:
     parameters:
       - in: path
