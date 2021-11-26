@@ -3,11 +3,13 @@ from dataclasses import dataclass
 from functools import wraps
 from http import HTTPStatus
 
+import opentracing
 from flask import jsonify, make_response, request
 from flask_jwt_extended import get_jwt
 from pydantic import ValidationError
 
 from db.redis_client import redis
+from core.tracer import tracer
 
 
 @dataclass
@@ -85,5 +87,20 @@ def rate_limit(max_rate):
             return result
 
         return decorator
+
+    return wrapper
+
+
+def trace(func):
+    """ Decorator to use with FlaskTracer on any function in route. """
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        request_id = request.headers.get('X-Request-Id')
+        parent_span = tracer.get_flask_tracer().get_span()
+        if request_id:
+            parent_span.set_tag('http.request_id', request_id)
+        with opentracing.tracer.start_span(operation_name=func.__name__,
+                                           child_of=parent_span):
+            return func(*args, **kwargs)
 
     return wrapper

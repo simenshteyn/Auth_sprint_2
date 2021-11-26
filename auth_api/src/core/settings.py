@@ -24,6 +24,9 @@ class AppSettings(BaseSettings):
     oauth_vk_id: str
     oauth_vk_secret: str
     vk_api_version: str
+    jaeger_service_name: str
+    jaeger_agent_host: str
+    jaeger_agent_port: int
 
 
 app_settings = {
@@ -46,6 +49,9 @@ app_settings = {
     'user_max_request_rate': os.getenv('USER_MAX_REQUEST_RATE'),
     'oauth_vk_id': os.getenv('OAUTH_VK_ID'),
     'oauth_vk_secret': os.getenv('OAUTH_VK_SECRET'),
-    'vk_api_version': os.getenv('VK_API_VERSION')
+    'vk_api_version': os.getenv('VK_API_VERSION'),
+    'jaeger_service_name': os.getenv('JAEGER_SERVICE_NAME'),
+    'jaeger_agent_host': os.getenv('JAEGER_AGENT_HOST'),
+    'jaeger_agent_port': os.getenv('JAEGER_AGENT_PORT')
 }
 config = AppSettings.parse_obj(app_settings)

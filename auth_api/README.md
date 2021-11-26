@@ -1,10 +1,12 @@
 #### AUTH Service
 
-Ссылка на репозиторий: [https://github.com/simenshteyn/Auth_sprint_1](https://github.com/simenshteyn/Auth_sprint_1)
+Ссылка на репозиторий: [https://github.com/simenshteyn/Auth_sprint_1](https://github.com/simenshteyn/Auth_sprint_2)
 
 OpenAPI design: `/design/authservice_openapi.yaml`
 
-SwaggerUI (in testings profile): [http://localhost:8080](http://localhost:8080)
+SwaggerUI (in testing profile): [http://localhost:8080](http://localhost:8080)
+
+JaegerUI (in testing profile): [http://localhost:16686](http://localhost:16686/)
 
 **Setup**
 1. Create .env file with sample (change the default passwords and secret keys!):

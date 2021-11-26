@@ -58,5 +58,5 @@ class PermissionService(BaseService):
 
     def validate_request(
             self, request: Request
-            ) -> Union[PermissionCreationRequest, Response]:
+    ) -> Union[PermissionCreationRequest, Response]:
         return self._validate(request, PermissionCreationRequest)
