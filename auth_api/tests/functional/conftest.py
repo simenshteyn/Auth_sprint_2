@@ -1,16 +1,16 @@
 import asyncio
 
 import aiohttp
+import aioredis
 import psycopg2
 import pytest
 from psycopg2.extras import DictCursor
 from redis import Redis
-import aioredis
 
 from tests.functional.settings import config
-from tests.functional.src.test_user import create_user, AuthTokenResponse
-from tests.functional.utils.db_utils import create_role, assign_role, \
-    remove_user, remove_role
+from tests.functional.src.test_user import AuthTokenResponse, create_user
+from tests.functional.utils.db_utils import (assign_role, create_role,
+                                             remove_role, remove_user)
 from tests.functional.utils.models import HTTPResponse
 
 dsl = {'dbname': config.pg_dbname,

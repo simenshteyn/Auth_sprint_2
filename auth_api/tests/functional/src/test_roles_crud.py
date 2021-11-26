@@ -3,8 +3,8 @@ from http import HTTPStatus
 import pytest
 
 from tests.functional.settings import config
-from tests.functional.utils.db_utils import get_auth_headers, remove_user, \
-    get_user_uuid
+from tests.functional.utils.db_utils import (get_auth_headers, get_user_uuid,
+                                             remove_user)
 from tests.functional.utils.extract import (extract_perm_check,
                                             extract_permission,
                                             extract_permissions, extract_role,

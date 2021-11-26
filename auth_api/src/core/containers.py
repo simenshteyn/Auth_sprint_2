@@ -2,12 +2,12 @@ from dependency_injector import containers, providers
 from dependency_injector.ext import flask
 from flask import Flask
 
+from services.oauth_login import OauthService
 from services.permission import PermissionService
 from services.role import RoleService
 from services.user import UserService
 from services.user_perms import UserPermsService
 from services.user_role import UserRoleService
-from services.oauth_login import OauthService
 
 
 class Container(containers.DeclarativeContainer):

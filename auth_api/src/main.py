@@ -4,8 +4,8 @@ from api.common import api
 from core.commands import commands
 from core.containers import Container
 from core.settings import config
-from db.pg import PG_URI, db
 from core.tracer import tracer
+from db.pg import PG_URI, db
 
 
 def create_app():

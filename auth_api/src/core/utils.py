@@ -8,8 +8,8 @@ from flask import jsonify, make_response, request
 from flask_jwt_extended import get_jwt
 from pydantic import ValidationError
 
-from db.redis_client import redis
 from core.tracer import tracer
+from db.redis_client import redis
 
 
 @dataclass

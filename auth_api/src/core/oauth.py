@@ -1,6 +1,6 @@
 import json
 
-from flask import current_app, url_for, redirect, request
+from flask import current_app, redirect, request, url_for
 from rauth import OAuth2Service
 
 from core.settings import config

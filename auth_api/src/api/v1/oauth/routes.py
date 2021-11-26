@@ -1,12 +1,11 @@
 from http import HTTPStatus
 
-from dependency_injector.wiring import inject, Provide
+from dependency_injector.wiring import Provide, inject
 from flask import Blueprint, jsonify, make_response
 
 from core.containers import Container
 from core.utils import ServiceException
 from models.social_accounts import SocialSignupResult
-
 from services.oauth_login import OauthService
 from services.user import UserService
 
