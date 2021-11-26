@@ -81,3 +81,22 @@ services:
       - auth_app
     profiles:
       - testing
+
+  jaeger:
+    image: jaegertracing/all-in-one:latest
+    container_name: jaeger
+    env_file:
+      - ./.env
+    ports:
+      - "5775:5775/udp"
+      - "6831:6831/udp"
+      - "6832:6832/udp"
+      - "5778:5778"
+      - "16686:16686"
+      - "14268:14268"
+      - "9411:9411"
+    depends_on:
+      pg_db:
+        condition: service_healthy
+    profiles:
+      - testing

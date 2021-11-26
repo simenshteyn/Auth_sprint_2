@@ -2,7 +2,7 @@ from typing import Union
 
 from flask import Request, Response
 
-from core.utils import ServiceException, trace
+from core.utils import ServiceException
 from db.pg import db
 from models.permission import Permission, PermissionCreationRequest
 from services.base import BaseService
@@ -15,7 +15,6 @@ class PermissionService(BaseService):
     def get_permission_list(self) -> list[Permission]:
         return Permission.query.all()
 
-    @trace
     def create_permission(self, permission_name: str) -> Permission:
         existing_permission: Permission = Permission.query.filter(
             Permission.permission_name == permission_name).first()
@@ -30,7 +29,6 @@ class PermissionService(BaseService):
         db.session.commit()
         return new_permission
 
-    @trace
     def edit_permission(self, permission_id: str,
                         permission_name: str) -> Permission:
         existing_permission: Permission = Permission.query.filter(
@@ -45,7 +43,6 @@ class PermissionService(BaseService):
         db.session.commit()
         return existing_permission
 
-    @trace
     def delete_permission(self, permission_id: str) -> Permission:
         existing_permission: Permission = Permission.query.filter(
             Permission.permission_id == permission_id).first()

@@ -1,6 +1,7 @@
 from flask import Flask
 from jaeger_client import Config
 from flask_opentracing import FlaskTracer
+from core.settings import config as app_config
 
 
 class TracerService:
@@ -12,7 +13,7 @@ class TracerService:
             config={
                 'sampler': {'type': 'const', 'param': 1}
             },
-            service_name='hello-world')
+            service_name=app_config.jaeger_service_name)
         return config.initialize_tracer()
 
     def init_app(self, app: Flask) -> FlaskTracer:

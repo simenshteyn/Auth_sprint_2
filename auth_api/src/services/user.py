@@ -5,7 +5,7 @@ from flask_jwt_extended import create_access_token, create_refresh_token
 from werkzeug.security import check_password_hash, generate_password_hash
 
 from core.settings import config
-from core.utils import ServiceException
+from core.utils import ServiceException, trace
 from db.pg import db
 from db.redis_client import redis
 from models.auth_event import AuthEvent
@@ -34,6 +34,7 @@ def authenticate(access_token) -> None:
 
 
 class UserService(BaseService):
+    @trace
     def create_user(self,
                     username: str,
                     password: str,
@@ -60,6 +61,7 @@ class UserService(BaseService):
         db.session.commit()
         return user
 
+    @trace
     def register_user(self,
                       username: str,
                       password: str,
@@ -78,6 +80,7 @@ class UserService(BaseService):
 
         return access_token, refresh_token
 
+    @trace
     def login(self, username: str, password: str, user_info: dict) \
             -> tuple[str, str]:
 
@@ -102,6 +105,7 @@ class UserService(BaseService):
 
         return access_token, refresh_token
 
+    @trace
     def refresh(self, user_id: str, refresh_token: str) -> tuple[str, str]:
         user: User = User.query.get(user_id)
 
@@ -130,6 +134,7 @@ class UserService(BaseService):
 
         return access_token, refresh_token
 
+    @trace
     def logout(self, user_id: str, access_token: str, refresh_token: str):
         user: User = User.query.get(user_id)
 
@@ -153,6 +158,7 @@ class UserService(BaseService):
 
         return access_token, refresh_token
 
+    @trace
     def modify(self, user_id, new_username: str, new_password: str):
         """change user's username and password"""
         user: User = User.query.get(user_id)
@@ -179,6 +185,7 @@ class UserService(BaseService):
         if db.session.is_modified(user):
             db.session.commit()
 
+    @trace
     def get_auth_history(self, user_id):
         history: list[AuthEvent] = AuthEvent.query.filter(
             (AuthEvent.auth_event_owner_id == user_id)
@@ -193,6 +200,7 @@ class UserService(BaseService):
 
     # TODO: see if this can be reused on login or disassemble it
     @staticmethod
+    @trace
     def commit_authentication(user: User,
                               event_type: str,
                               access_token: str,
@@ -213,14 +221,17 @@ class UserService(BaseService):
                   value='',
                   ex=config.access_token_expiration)
 
+    @trace
     def validate_signup(
             self, request: Request) -> Union[SignupRequest, Response]:
         return self._validate(request, SignupRequest)
 
+    @trace
     def validate_login(
             self, request: Request) -> Union[LoginRequest, Response]:
         return self._validate(request, LoginRequest)
 
+    @trace
     def validate_modify(
             self, request: Request) -> Union[ModifyRequest, Response]:
         return self._validate(request, ModifyRequest)
