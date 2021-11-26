@@ -5,6 +5,7 @@ from core.commands import commands
 from core.containers import Container
 from core.settings import config
 from db.pg import PG_URI, db
+from core.tracer import tracer
 
 
 def create_app():
@@ -20,12 +21,12 @@ def create_app():
         }
     }
     db.init_app(app)
+    tracer.init_app(app)
     app.register_blueprint(api, url_prefix='/api')
     app.register_blueprint(commands)
 
     app.config['JWT_SECRET_KEY'] = config.jwt_secret_key
     JWTManager(app)
-
     return app
 
 
