@@ -76,3 +76,27 @@ def make_get_request(session, settings):
             )
 
     return inner
+
+
+@pytest.fixture(scope='session')
+def make_post_request(session):
+    async def inner(url: str,
+                    json: dict = None,
+                    headers: dict = None) -> HTTPResponse:
+        json = json or {}
+        headers = headers or {}
+        # url = '{protocol}://{host}:{port}/api/v{api_version}/{method}'.format(
+        #     protocol=config.service_protocol,
+        #     host=config.service_host,
+        #     port=config.service_port,
+        #     api_version=config.service_api_version,
+        #     method=method
+        # )
+        async with session.post(url, json=json, headers=headers) as response:
+            return HTTPResponse(
+                body=await response.json(),
+                headers=response.headers,
+                status=response.status,
+            )
+
+    return inner

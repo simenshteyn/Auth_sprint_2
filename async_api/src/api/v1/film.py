@@ -1,10 +1,12 @@
-from http import HTTPStatus
 from typing import List, Optional
 
-from fastapi import APIRouter, Depends, HTTPException, Query, status
+import aiohttp
+from aiohttp import ClientConnectorError, ClientConnectionError
+from fastapi import APIRouter, Depends, HTTPException, Query, status, Request
 from fastapi.logger import logger as log
 from pydantic import BaseModel
 
+from core.config import AUTH_SERVICE_USER_ROLES_URL
 from models.film import Film as FilmData
 from services.film import FilmService, get_film_service
 
@@ -37,7 +39,6 @@ class FilmList(BaseModel):
 
 def _create_response_model(film: FilmData):
     """Convert film from internal model to response model."""
-    print(type(film.director))
     return Film(
         id=film.id,
         title=film.title,
@@ -52,26 +53,26 @@ def _create_response_model(film: FilmData):
 
 @router.get('/search', response_model=FilmList)
 async def search_films(
-    query: str = Query(
-        ...,
-        description='Query string (any text)',
-    ),
-    sort: Optional[List[str]] = Query(
-        None,
-        description="""Sort field name.
+        query: str = Query(
+            ...,
+            description='Query string (any text)',
+        ),
+        sort: Optional[List[str]] = Query(
+            None,
+            description="""Sort field name.
         Minus sign "-" before name means "descending".
         This parameter can be repeated.""",
-    ),
-    offset: Optional[int] = Query(
-        0,
-        description='Offset (page number)',
-    ),
-    limit: Optional[int] = Query(
-        10,
-        description="""Data rows per page.
+        ),
+        offset: Optional[int] = Query(
+            0,
+            description='Offset (page number)',
+        ),
+        limit: Optional[int] = Query(
+            10,
+            description="""Data rows per page.
         Page may contain less rows than requested (for last or single page)""",
-    ),
-    film_service: FilmService = Depends(get_film_service),
+        ),
+        film_service: FilmService = Depends(get_film_service),
 ):
     """
     Paginated list of movies that satisfy query.\n
@@ -107,11 +108,11 @@ async def search_films(
     },
 )
 async def get_film_details(
-    film_id: str = Query(
-        ...,
-        description='Film ID (UUID)',
-    ),
-    film_service: FilmService = Depends(get_film_service),
+        film_id: str = Query(
+            ...,
+            description='Film ID (UUID)',
+        ),
+        film_service: FilmService = Depends(get_film_service),
 ) -> Film:
     """
     Detailed info about movie by its ID.\n
@@ -130,27 +131,28 @@ async def get_film_details(
 
 @router.get('/', response_model=FilmList)
 async def get_film_list(
-    filter_by_genre: Optional[List[str]] = Query(
-        None,
-        description='Genre name. This parameter can be repeated.',
-        alias='filter[genre]',
-    ),
-    sort: Optional[List[str]] = Query(
-        None,
-        description="""Sort field name.
+        request: Request,
+        filter_by_genre: Optional[List[str]] = Query(
+            None,
+            description='Genre name. This parameter can be repeated.',
+            alias='filter[genre]',
+        ),
+        sort: Optional[List[str]] = Query(
+            None,
+            description="""Sort field name.
         Minus sign "-" before name means "descending".
         This parameter can be repeated.""",
-    ),
-    offset: Optional[int] = Query(
-        0,
-        description='Offset (page number)',
-    ),
-    limit: Optional[int] = Query(
-        10,
-        description="""Data rows per page.
+        ),
+        offset: Optional[int] = Query(
+            0,
+            description='Offset (page number)',
+        ),
+        limit: Optional[int] = Query(
+            10,
+            description="""Data rows per page.
         Page may contain less rows than requested (for last or single page)""",
-    ),
-    film_service: FilmService = Depends(get_film_service),
+        ),
+        film_service: FilmService = Depends(get_film_service)
 ):
     """
     Paginated list of movies.\n
@@ -158,8 +160,33 @@ async def get_film_list(
     Full list (paginated and sorted): ".../film?sort=-imdb_rating&offset=100&limit=10"\n
     Filtered list: ".../film?filter[genre]=Comedy&filter[genre]=Drama" (boolean OR)
     """
+
+    auth_header = request.headers.get('Authorization')
+    is_subscriber = False
+
+    if auth_header:
+        headers = {
+            'Authorization': auth_header
+        }
+
+        try:
+            async with aiohttp.ClientSession(headers=headers) as session:
+                async with session.get(AUTH_SERVICE_USER_ROLES_URL,
+                                       timeout=3) as resp:
+                    print(resp.status)
+                    roles = await resp.json()
+                    for role in roles:
+                        if role['role_name'] == 'subscriber':
+                            is_subscriber = True
+        except ClientConnectionError:
+            # Graceful degradation
+            is_subscriber = False
+
+    filter_by_max_rating = None if is_subscriber else 5
+
     docs, docs_found = await film_service.get_list(
         filter_by_genre=filter_by_genre,
+        filter_by_max_rating=filter_by_max_rating,
         sort=sort,
         offset=offset,
         limit=limit,
