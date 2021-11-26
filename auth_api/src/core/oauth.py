@@ -4,6 +4,7 @@ from flask import current_app, url_for, redirect, request
 from rauth import OAuth2Service
 
 from core.settings import config
+from core.utils import get_auth_headers
 
 
 class OAuthBase(object):
@@ -129,3 +130,93 @@ class VkSignUp(OAuthSignUp):
         return (str(response.get('user_id')),
                 self.provider_name,
                 response.get('email'))
+
+
+class YandexSignIn(OAuthSignIn):
+    def __init__(self):
+        super(YandexSignIn, self).__init__('yandex')
+        self.service = OAuth2Service(
+            name='yandex',
+            client_id=self.consumer_id,
+            client_secret=self.consumer_secret,
+            authorize_url='https://oauth.yandex.ru/authorize',
+            access_token_url='https://oauth.yandex.ru/token',
+            base_url='https://login.yandex.ru/info'
+        )
+
+    def authorize(self):
+        result = redirect(self.service.get_authorize_url(
+            scope='login:email login:info',
+            response_type='code',
+            redirect_uri=self.get_callback_url())
+        )
+        return result
+
+    def callback(self):
+        def decode_json(payload):
+            return json.loads(payload.decode('utf-8'))
+
+        if 'code' not in request.args:
+            return None, None, None
+        try:
+            oauth_session = self.service.get_auth_session(
+                method='POST', data={
+                    'grant_type': 'authorization_code',
+                    'client_id': self.consumer_id,
+                    'client_secret': self.consumer_secret,
+                    'code': request.args['code']
+                }, decoder=decode_json)
+            response = oauth_session.access_token_response.json()
+            access_token = response.get('access_token')
+        except Exception:
+            return None, None, None
+        user = oauth_session.get('',
+                                 headers=get_auth_headers(access_token)).json()
+        return (str(user.get('id')),
+                self.provider_name,
+                user.get('default_email'))
+
+
+class YandexSignUp(OAuthSignUp):
+    def __init__(self):
+        super(YandexSignUp, self).__init__('yandex')
+        self.service = OAuth2Service(
+            name='yandex',
+            client_id=self.consumer_id,
+            client_secret=self.consumer_secret,
+            authorize_url='https://oauth.yandex.ru/authorize',
+            access_token_url='https://oauth.yandex.ru/token',
+            base_url='https://login.yandex.ru/info'
+        )
+
+    def authorize(self):
+        result = redirect(self.service.get_authorize_url(
+            scope='login:email login:info',
+            response_type='code',
+            redirect_uri=self.get_callback_url())
+        )
+        return result
+
+    def callback(self):
+        def decode_json(payload):
+            return json.loads(payload.decode('utf-8'))
+
+        if 'code' not in request.args:
+            return None, None, None
+        try:
+            oauth_session = self.service.get_auth_session(
+                method='POST', data={
+                    'grant_type': 'authorization_code',
+                    'client_id': self.consumer_id,
+                    'client_secret': self.consumer_secret,
+                    'code': request.args['code']
+                }, decoder=decode_json)
+            response = oauth_session.access_token_response.json()
+            access_token = response.get('access_token')
+        except Exception:
+            return None, None, None
+        user = oauth_session.get('',
+                                 headers=get_auth_headers(access_token)).json()
+        return (str(user.get('id')),
+                self.provider_name,
+                user.get('default_email'))

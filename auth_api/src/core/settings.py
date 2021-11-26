@@ -24,6 +24,8 @@ class AppSettings(BaseSettings):
     oauth_vk_id: str
     oauth_vk_secret: str
     vk_api_version: str
+    oauth_ydx_id: str
+    oauth_ydx_secret: str
     jaeger_service_name: str
     jaeger_agent_host: str
     jaeger_agent_port: int
@@ -50,6 +52,8 @@ app_settings = {
     'oauth_vk_id': os.getenv('OAUTH_VK_ID'),
     'oauth_vk_secret': os.getenv('OAUTH_VK_SECRET'),
     'vk_api_version': os.getenv('VK_API_VERSION'),
+    'oauth_ydx_id': os.getenv('OAUTH_YDX_ID'),
+    'oauth_ydx_secret': os.getenv('OAUTH_YDX_SECRET'),
     'jaeger_service_name': os.getenv('JAEGER_SERVICE_NAME'),
     'jaeger_agent_host': os.getenv('JAEGER_AGENT_HOST'),
     'jaeger_agent_port': os.getenv('JAEGER_AGENT_PORT')

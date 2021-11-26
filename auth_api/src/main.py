@@ -18,6 +18,10 @@ def create_app():
         'vk': {
             'id': config.oauth_vk_id,
             'secret': config.oauth_vk_secret
+        },
+        'yandex': {
+            'id': config.oauth_ydx_id,
+            'secret': config.oauth_ydx_secret
         }
     }
     db.init_app(app)

@@ -341,7 +341,7 @@ paths:
           required: true
           schema:
             type: string
-          description: Name of OAuth social provider, for example 'vk'
+          description: Name of OAuth social provider, for example 'vk' or 'yandex'
       summary: Authorize User by OAuth with social provider
       tags:
         - Authorization
@@ -370,7 +370,7 @@ paths:
           required: true
           schema:
             type: string
-          description: Name of OAuth social provider, for example 'vk'
+          description: Name of OAuth social provider, for example 'vk' or 'yandex'
         - in: query
           name: code
           required: true
@@ -405,7 +405,7 @@ paths:
           required: true
           schema:
             type: string
-          description: Name of OAuth social provider, for example 'vk'
+          description: Name of OAuth social provider, for example 'vk' or 'yandex'
       summary: Signup User by OAuth with social provider
       tags:
         - Authorization
@@ -434,7 +434,7 @@ paths:
           required: true
           schema:
             type: string
-          description: Name of OAuth social provider, for example 'vk'
+          description: Name of OAuth social provider, for example 'vk' or 'yandex'
         - in: query
           name: code
           required: true

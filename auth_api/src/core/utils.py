@@ -93,14 +93,20 @@ def rate_limit(max_rate):
 
 def trace(func):
     """ Decorator to use with FlaskTracer on any function in route. """
+
     @wraps(func)
     def wrapper(*args, **kwargs):
-        request_id = request.headers.get('X-Request-Id')
         parent_span = tracer.get_flask_tracer().get_span()
-        if request_id:
-            parent_span.set_tag('http.request_id', request_id)
+        if request:
+            request_id = request.headers.get('X-Request-Id')
+            if request_id:
+                parent_span.set_tag('http.request_id', request_id)
         with opentracing.tracer.start_span(operation_name=func.__name__,
                                            child_of=parent_span):
             return func(*args, **kwargs)
 
     return wrapper
+
+
+def get_auth_headers(token: str):
+    return {'Authorization': 'Bearer ' + token}
