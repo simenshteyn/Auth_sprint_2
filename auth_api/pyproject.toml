@@ -1,7 +1,7 @@
 [tool.poetry]
-name = "auth_sprint_1"
+name = "auth_sprint_2"
 version = "0.1.0"
-description = ""
+description = "AUTH Service"
 authors = ["Sergey Simenshteyn <simenshteyn@gmail.com>"]
 
 [tool.poetry.dependencies]
