@@ -4,6 +4,8 @@ import aiohttp
 import aioredis
 import psycopg2
 import pytest
+import random
+import string
 from psycopg2.extras import DictCursor
 from redis import Redis
 
@@ -203,3 +205,34 @@ async def get_superuser_token(pg_curs, redis_conn):
     # Remove superuser and superadmin role
     remove_user(pg_curs, user_id=su_user_uuid)
     remove_role(pg_curs, role_id=su_role_uuid)
+
+
+@pytest.fixture(scope='function')
+async def get_subscriber_token(pg_curs, redis_conn):
+    # Create a subscriber and get his access token
+    username = password = "".join(
+        random.choices(string.ascii_lowercase, k=10))
+    email = username + "@yandex.com"
+
+    valid_data = {
+        "username": username, "password": password, "email": email
+    }
+
+    response, user = create_user(valid_data, pg_curs, redis_conn)
+    tokens = AuthTokenResponse(**response.json())
+    access_token = tokens.access_token
+    user_uuid = user['user_id']
+    assert response.status_code == 200
+    assert user['user_login'] == username
+    assert user['user_email'] == email
+    assert len(access_token) > 5
+
+    # Assign superuser role to superuser
+    role_uuid = create_role(pg_curs,
+                            role_name=config.service_subscriber_role)
+    assign_role(pg_curs, owner_id=user_uuid, role_id=role_uuid)
+    yield access_token
+
+    # Remove superuser and superadmin role
+    remove_user(pg_curs, user_id=user_uuid)
+    remove_role(pg_curs, role_id=role_uuid)
