@@ -1,12 +1,13 @@
 import random
 import string
+
 from core.oauth import OAuthSignIn, OAuthSignUp
 from core.utils import ServiceException
 from db.pg import db
 from models.social_accounts import SocialAccount, SocialSignupResult
 from models.user import User
 from services.base import BaseService
-from services.user import generate_tokens, UserService
+from services.user import UserService, generate_tokens
 
 
 class OauthService(BaseService):

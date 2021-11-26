@@ -324,7 +324,7 @@ python-versions = "*"
 name = "isort"
 version = "5.10.1"
 description = "A Python utility / library to sort Python imports."
-category = "main"
+category = "dev"
 optional = false
 python-versions = ">=3.6.1,<4.0"
 
@@ -757,7 +757,7 @@ testing = ["coverage (>=5.0.3)", "zope.event", "zope.testing"]
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.9"
-content-hash = "7d1dac6d39df56aa9d8cbb955ae0f447f8fc0d05830de1ba36159ff6109d3959"
+content-hash = "2374fc6d6e542730237f605ecf1fb575a1325cf78542440fc72fb1718e397de0"
 
 [metadata.files]
 aiohttp = [

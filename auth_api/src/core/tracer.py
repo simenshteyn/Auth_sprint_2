@@ -1,6 +1,7 @@
 from flask import Flask
-from jaeger_client import Config
 from flask_opentracing import FlaskTracer
+from jaeger_client import Config
+
 from core.settings import config as app_config
 
 

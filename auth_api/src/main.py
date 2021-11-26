@@ -4,8 +4,8 @@ from api.common import api
 from core.commands import commands
 from core.containers import Container
 from core.settings import config
-from db.pg import PG_URI, db
 from core.tracer import tracer
+from db.pg import PG_URI, db
 
 
 def create_app():
@@ -18,6 +18,10 @@ def create_app():
         'vk': {
             'id': config.oauth_vk_id,
             'secret': config.oauth_vk_secret
+        },
+        'yandex': {
+            'id': config.oauth_ydx_id,
+            'secret': config.oauth_ydx_secret
         }
     }
     db.init_app(app)

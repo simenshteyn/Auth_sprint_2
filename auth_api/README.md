@@ -1,6 +1,6 @@
-#### AUTH Service
+## AUTH Service
 
-Ссылка на репозиторий: [https://github.com/simenshteyn/Auth_sprint_1](https://github.com/simenshteyn/Auth_sprint_2)
+Ссылка на репозиторий: [https://github.com/simenshteyn/Auth_sprint_2](https://github.com/simenshteyn/Auth_sprint_2)
 
 OpenAPI design: `/design/authservice_openapi.yaml`
 
@@ -14,6 +14,20 @@ JaegerUI (in testing profile): [http://localhost:16686](http://localhost:16686/)
 `$ mv env.sample .env`
 
 `$ vi .env`
+
+2. Create OAuth App to use in OAuth authorization process:
+
+ - vk: [https://vk.com/editapp?act=create](https://vk.com/editapp?act=create) (scope: email)
+ - yandex: [https://oauth.yandex.ru/client/new](https://oauth.yandex.ru/client/new) (scopes: email; login, name, gender)
+
+3. Edit OAuth APP_ID and SECRET key at `.env` file with yours or use default.
+
+
+4. At OAuth app options fill redirect URI for callbacks with provider name (`vk` or `yandex`):
+
+   - http://localhost:8000/api/v1/oauth/login/callback/vk
+   - http://localhost:8000/api/v1/oauth/signup/callback/vk
+
 
 **Run project without tests**
 
@@ -35,7 +49,22 @@ JaegerUI (in testing profile): [http://localhost:16686](http://localhost:16686/)
 
 `$  docker-compose -f docker-compose.yml -f docker-compose.prod.yml --profile=testing up --build`
 
-- Clear docker containers with all data.
+ - OAuth testing (manual for security):
+   - Vkontakte:
+     1. Login: [http://localhost:8000/api/v1/oauth/login/vk](http://localhost:8000/api/v1/oauth/login/vk) (no account, will fail)
+     2. Signup: [http://localhost:8000/api/v1/oauth/signup/vk](http://localhost:8000/api/v1/oauth/signup/vk) (will create account)
+     3. Login again: [http://localhost:8000/api/v1/oauth/login/vk](http://localhost:8000/api/v1/oauth/login/vk) (will succeed)
+   - Yandex:
+     1. Login: [http://localhost:8000/api/v1/oauth/login/yandex](http://localhost:8000/api/v1/oauth/login/yandex) (no account, will fail)
+     2. Signup: [http://localhost:8000/api/v1/oauth/signup/yandex](http://localhost:8000/api/v1/oauth/signup/yandex) (will create account)
+     3. Login again: [http://localhost:8000/api/v1/oauth/login/yandex](http://localhost:8000/api/v1/oauth/login/yandex) (will succeed)
+
+ 
+ 
+ - Use [JaegerUI](http://localhost:16686) (in testing profile) and `@trac` decorator for tracing.
+    
+
+ - Clear docker containers with all data:
  
 `$ docker-compose down -v`
 
