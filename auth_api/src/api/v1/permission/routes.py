@@ -1,12 +1,11 @@
 from http import HTTPStatus
 
-from dependency_injector.wiring import Provide, inject
-from flask import Blueprint, Response, jsonify, make_response, request
-from flask_jwt_extended import jwt_required
-
 from core.containers import Container
 from core.settings import config
 from core.utils import ServiceException, authenticate, rate_limit
+from dependency_injector.wiring import Provide, inject
+from flask import Blueprint, Response, jsonify, make_response, request
+from flask_jwt_extended import jwt_required
 from services.permission import PermissionService
 
 permission = Blueprint('permission', __name__, url_prefix='/permission')

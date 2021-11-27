@@ -1,14 +1,13 @@
 import asyncio
+import random
+import string
 
 import aiohttp
 import aioredis
 import psycopg2
 import pytest
-import random
-import string
 from psycopg2.extras import DictCursor
 from redis import Redis
-
 from tests.functional.settings import config
 from tests.functional.src.test_user import AuthTokenResponse, create_user
 from tests.functional.utils.db_utils import (assign_role, create_role,

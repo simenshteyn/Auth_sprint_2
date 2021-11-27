@@ -8,7 +8,36 @@ SwaggerUI (in testing profile): [http://localhost:8081](http://localhost:8080)
 
 JaegerUI (in testing profile): [http://localhost:16686](http://localhost:16686/)
 
-**Setup**
+**Before Setup you should start AsyncAPI Service for integration tests**
+
+`$ cd async_api/`
+
+1.  Make build:
+
+`$ docker network create videoserv_net`
+
+`$ docker-compose -f docker-compose.stor.yml build`
+
+`$ docker-compose build`
+
+`$ docker-compose -f docker-compose.test.yml build`
+
+2.  Start storage: Elasticsearch and Redis:
+
+`$ docker-compose -f docker-compose.stor.yml up -d`
+
+3. Load data from dump for testing (take some time):
+
+`$ docker-compose -f docker-compose.dump.yml run --rm load_elastic_dump`
+
+4. Start Async API service:
+
+`$ docker-compose up -d`
+
+**Setup Auth Service**
+
+`$ cd auth_api/`
+
 1. Create .env file with sample (change the default passwords and secret keys!):
 
 `$ mv env.sample .env`
@@ -68,6 +97,6 @@ JaegerUI (in testing profile): [http://localhost:16686](http://localhost:16686/)
  
 `$ docker-compose down -v`
 
-**Execute superadmin console command:**
+**Execute superadmin console command to create superuser:**
 
 `$ docker exec --env FLASK_APP=main -it auth_app flask manage createsuperuser`

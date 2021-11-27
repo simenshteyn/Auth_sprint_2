@@ -1,11 +1,10 @@
-from flask_jwt_extended import JWTManager
-
 from api.common import api
 from core.commands import commands
 from core.containers import Container
 from core.settings import config
 from core.tracer import tracer
 from db.pg import PG_URI, db
+from flask_jwt_extended import JWTManager
 
 
 def create_app():

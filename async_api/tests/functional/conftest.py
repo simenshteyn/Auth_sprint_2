@@ -7,9 +7,8 @@ import aiohttp
 import aioredis
 import pytest
 from elasticsearch import AsyncElasticsearch
-from multidict import CIMultiDict, CIMultiDictProxy
-
 from functional.settings import TestSettings
+from multidict import CIMultiDict, CIMultiDictProxy
 
 
 @dataclass

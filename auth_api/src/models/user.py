@@ -1,10 +1,9 @@
+from core.settings import config
+from db.pg import db
 from pydantic import BaseModel, EmailStr, constr
 from sqlalchemy import DefaultClause, text
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.sql import func
-
-from core.settings import config
-from db.pg import db
 
 
 class User(db.Model):

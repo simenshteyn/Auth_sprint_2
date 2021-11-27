@@ -1,5 +1,3 @@
-from typing import Optional
-
 from models.common import ElasticModel
 
 

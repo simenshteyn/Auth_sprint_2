@@ -1,13 +1,14 @@
 import json
+
 import pytest
 from aioredis import Redis
-from functional.conftest import make_get_request, redis_client
 
 # Testing endpoint /api/v1/person/
 
 test_data = [
     # Non-existing ID
-    ('00000000-0000-0000-0000-000000000000', 404, "Request with non-existing id has to result in status 404"),
+    ('00000000-0000-0000-0000-000000000000', 404,
+     "Request with non-existing id has to result in status 404"),
     # Empty id
     ('', 404, "Request with empty/missing id has to result in status 404"),
 ]
@@ -28,9 +29,11 @@ cache_test_data = [
 
 
 # In the following test the assertions depend on each other, and therefore executed as a single test
-@pytest.mark.parametrize("existing_id,expected_status,expected_record", cache_test_data)
+@pytest.mark.parametrize("existing_id,expected_status,expected_record",
+                         cache_test_data)
 @pytest.mark.asyncio
-async def test_person_existing(make_get_request, redis_client: Redis, existing_id, expected_status, expected_record):
+async def test_person_existing(make_get_request, redis_client: Redis,
+                               existing_id, expected_status, expected_record):
     # existing person_id (no cache)
     url = f'/person/{existing_id}'
     await redis_client.flushall()  # make sure there is no cache
@@ -53,21 +56,27 @@ async def test_person_existing(make_get_request, redis_client: Redis, existing_i
 # None means we aren't interested in checking the value
 search_test_data = [
     # No query string
-    ({'page[number]': '1', 'page[size]': '50', 'sort': '-full_name'}, 422, None),
+    ({'page[number]': '1', 'page[size]': '50', 'sort': '-full_name'}, 422,
+     None),
     # No results
-    ({'query': 'xxxxxxx', 'page[number]': '1', 'page[size]': '50', 'sort': '-full_name'}, 200, 0),
+    ({'query': 'xxxxxxx', 'page[number]': '1', 'page[size]': '50',
+      'sort': '-full_name'}, 200, 0),
     # Empty query returns all results
-    ({'query': '', 'page[number]': '1', 'page[size]': '10000', 'sort': '-full_name'}, 200, 4166),
+    ({'query': '', 'page[number]': '1', 'page[size]': '10000',
+      'sort': '-full_name'}, 200, 4166),
     # Searching for specific person
-    ({'query': 'Édith Piaf', 'page[number]': '1', 'page[size]': '10000', 'sort': '-full_name'}, 200, 1)
+    ({'query': 'Édith Piaf', 'page[number]': '1', 'page[size]': '10000',
+      'sort': '-full_name'}, 200, 1)
 
 ]
 
 
 # Testing endpoint /person/search/?query=smith&page[number]=1&page[size]=50&sort=-full_name
-@pytest.mark.parametrize("query,expected_status_code,expected_body_length", search_test_data)
+@pytest.mark.parametrize("query,expected_status_code,expected_body_length",
+                         search_test_data)
 @pytest.mark.asyncio
-async def test_person_search(make_get_request, query, expected_status_code, expected_body_length):
+async def test_person_search(make_get_request, query, expected_status_code,
+                             expected_body_length):
     url = '/person/search/'
     response = await make_get_request(url, query)
 
@@ -79,17 +88,22 @@ async def test_person_search(make_get_request, query, expected_status_code, expe
 
 person_films_test_data = [
     ('1dfa1b08-5a44-4096-bcf0-a318d3645f16', 200, 2,
-     ['8f20c184-7018-4c7c-82c9-e2228f75dff3', 'b10a3e12-58ce-4dea-a49d-b7d7c1784757'])
+     ['8f20c184-7018-4c7c-82c9-e2228f75dff3',
+      'b10a3e12-58ce-4dea-a49d-b7d7c1784757'])
 ]
 
 
-@pytest.mark.parametrize("person_id,expected_status_code,expected_body_length,expected_film_ids",
-                         person_films_test_data)
+@pytest.mark.parametrize(
+    "person_id,expected_status_code,expected_body_length,expected_film_ids",
+    person_films_test_data)
 @pytest.mark.asyncio
-async def test_person_films(make_get_request, person_id, expected_status_code, expected_body_length, expected_film_ids):
+async def test_person_films(make_get_request, person_id, expected_status_code,
+                            expected_body_length, expected_film_ids):
     url = f'/person/{person_id}/film/'
     response = await make_get_request(url)
     assert response.status == expected_status_code
-    assert len(response.body) == expected_body_length, "Response has to return %d records, %d returned" % \
-                                                       (expected_body_length, len(response.body))
+    assert len(
+        response.body) == expected_body_length, "Response has to return %d records, %d returned" % \
+                                                (expected_body_length,
+                                                 len(response.body))
     assert [film['id'] for film in response.body] == expected_film_ids

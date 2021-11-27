@@ -1,10 +1,9 @@
 import json
 
-from flask import current_app, redirect, request, url_for
-from rauth import OAuth2Service
-
 from core.settings import config
 from core.utils import get_auth_headers
+from flask import current_app, redirect, request, url_for
+from rauth import OAuth2Service
 
 
 class OAuthBase(object):

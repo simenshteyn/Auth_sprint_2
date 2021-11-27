@@ -2,14 +2,12 @@ from functools import lru_cache
 from typing import Optional
 
 from aioredis import Redis
+from db.elastic import get_elastic
+from db.redis import get_redis
 from elasticsearch import AsyncElasticsearch
 from elasticsearch import NotFoundError as ESNotFoundError
 from elasticsearch_dsl import Search
-
 from fastapi import Depends
-
-from db.elastic import get_elastic
-from db.redis import get_redis
 from models.person import Person
 
 PERSON_CACHE_EXPIRE_IN_SECONDS = 60 * 5

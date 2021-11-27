@@ -2,6 +2,8 @@ from functools import lru_cache
 from typing import List, Optional, Tuple
 
 from aioredis import Redis
+from db.elastic import get_elastic
+from db.redis import get_redis
 from elasticsearch import AsyncElasticsearch
 from elasticsearch import NotFoundError as ESNotFoundError
 from elasticsearch import RequestError as ESRequestError
@@ -9,9 +11,6 @@ from elasticsearch_dsl import Search
 from elasticsearch_dsl.query import Q
 from fastapi import Depends, HTTPException
 from fastapi.logger import logger as log
-
-from db.elastic import get_elastic
-from db.redis import get_redis
 from models.film import Film
 
 FILM_CACHE_EXPIRE_IN_SECONDS = 60 * 5

@@ -1,10 +1,9 @@
 from dataclasses import dataclass
 
-from sqlalchemy import DefaultClause, text
-from sqlalchemy.dialects.postgresql import UUID
-
 from core.settings import config
 from db.pg import db
+from sqlalchemy import DefaultClause, text
+from sqlalchemy.dialects.postgresql import UUID
 
 
 @dataclass

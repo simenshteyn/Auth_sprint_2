@@ -1,9 +1,9 @@
+from typing import List, Optional
+
+from api.v1.film import Film
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.params import Query
 from pydantic import BaseModel
-from typing import Optional, List
-
-from api.v1.film import Film
 from services.genre import GenreService, get_genre_service
 
 GENRE_NOT_FOUND = 'Genre not found'

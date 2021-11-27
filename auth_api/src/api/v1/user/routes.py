@@ -1,13 +1,12 @@
 from http import HTTPStatus
 from time import sleep
 
-from dependency_injector.wiring import Provide, inject
-from flask import Blueprint, Response, jsonify, make_response, request
-from flask_jwt_extended import get_jwt, jwt_required
-
 from core.containers import Container
 from core.settings import config
 from core.utils import ServiceException, authenticate, rate_limit
+from dependency_injector.wiring import Provide, inject
+from flask import Blueprint, Response, jsonify, make_response, request
+from flask_jwt_extended import get_jwt, jwt_required
 from models.permission import Permission
 from models.role import Role
 from services.user import UserService

@@ -2,14 +2,13 @@ from collections import namedtuple
 from http import HTTPStatus
 from typing import Type, Union
 
-from flask import Request, Response, jsonify, make_response
-from pydantic import BaseModel, ValidationError
-
 from core.settings import config
 from core.utils import ServiceException, make_service_exception
+from flask import Request, Response, jsonify, make_response
 from models.role import Role
 from models.roles_owners import RoleOwner
 from models.user import User
+from pydantic import BaseModel, ValidationError
 
 Rcode = namedtuple('Rcode', 'code message')
 

@@ -1,11 +1,10 @@
 from dataclasses import dataclass
 
+from core.settings import config
+from db.pg import db
 from pydantic import BaseModel
 from sqlalchemy import DefaultClause, text
 from sqlalchemy.dialects.postgresql import UUID
-
-from core.settings import config
-from db.pg import db
 
 
 @dataclass

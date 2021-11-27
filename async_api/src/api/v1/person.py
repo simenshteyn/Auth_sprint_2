@@ -1,13 +1,12 @@
+from typing import List, Optional
+from uuid import UUID
+
+from api.v1.film import Film
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.params import Query
 from pydantic import BaseModel
-from typing import Optional, List
-
-from api.v1.film import Film
 from services.film import FilmService, get_film_service
 from services.person import PersonService, get_person_service
-
-from uuid import UUID
 
 NO_FILMS_FOUND = 'No films found'
 PERSON_NOT_FOUND = 'Person not found'

@@ -4,12 +4,11 @@ from functools import wraps
 from http import HTTPStatus
 
 import opentracing
+from core.tracer import tracer
+from db.redis_client import redis
 from flask import jsonify, make_response, request
 from flask_jwt_extended import get_jwt
 from pydantic import ValidationError
-
-from core.tracer import tracer
-from db.redis_client import redis
 
 
 @dataclass
