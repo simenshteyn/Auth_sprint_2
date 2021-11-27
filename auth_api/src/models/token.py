@@ -1,9 +1,8 @@
+from core.settings import config
+from db.pg import db
 from sqlalchemy import DefaultClause, FetchedValue, text
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.sql import func
-
-from core.settings import config
-from db.pg import db
 
 
 class Token(db.Model):

@@ -1,4 +1,4 @@
-from typing import Optional, Union, List
+from typing import List, Optional, Union
 
 from models.common import ElasticModel
 

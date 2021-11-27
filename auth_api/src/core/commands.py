@@ -1,11 +1,10 @@
 import getpass
 
-from dependency_injector.wiring import Provide
-from flask import Blueprint
-
 from core.containers import Container
 from core.utils import ServiceException
 from db.pg import db
+from dependency_injector.wiring import Provide
+from flask import Blueprint
 from services.role import RoleService
 from services.user import UserService
 from services.user_role import UserRoleService

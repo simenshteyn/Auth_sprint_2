@@ -1,7 +1,6 @@
 from http import HTTPStatus
 
 import pytest
-
 from tests.functional.settings import config
 from tests.functional.utils.db_utils import (get_auth_headers, get_user_uuid,
                                              remove_user)

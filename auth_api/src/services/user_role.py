@@ -1,9 +1,8 @@
 from typing import Union
 
-from flask import Request, Response
-
 from core.utils import ServiceException
 from db.pg import db
+from flask import Request, Response
 from models.role import Role
 from models.roles_owners import RoleOwner
 from models.user import User, UserRoleAssignRequest

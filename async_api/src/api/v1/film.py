@@ -1,13 +1,12 @@
 from typing import List, Optional
 
 import aiohttp
-from aiohttp import ClientConnectorError, ClientConnectionError
-from fastapi import APIRouter, Depends, HTTPException, Query, status, Request
-from fastapi.logger import logger as log
-from pydantic import BaseModel
-
+from aiohttp import ClientConnectionError
 from core.config import AUTH_SERVICE_USER_ROLES_URL
+from fastapi import APIRouter, Depends, HTTPException, Query, Request, status
+from fastapi.logger import logger as log
 from models.film import Film as FilmData
+from pydantic import BaseModel
 from services.film import FilmService, get_film_service
 
 FILM_NOT_FOUND = 'Film not found'

@@ -1,7 +1,6 @@
 from http import HTTPStatus
 
 import pytest
-
 from tests.functional.utils.db_utils import get_auth_headers
 from tests.functional.utils.extract import (extract_permission,
                                             extract_permissions)

@@ -1,7 +1,7 @@
 import json
+
 import pytest
 from aioredis import Redis
-from functional.conftest import make_get_request, redis_client
 
 
 # Testing endpoint /api/v1/genre/
@@ -46,7 +46,7 @@ async def test_genre_invalid(make_get_request, redis_client: Redis):
     assert response.body == expected
 
 
-# Testing endpoint /genre/search/?query=smith&page[number]=1&page[size]=50&sort=-title
+# Testing  /genre/search/?query=smith&page[number]=1&page[size]=50&sort=-title
 @pytest.mark.asyncio
 async def test_genre_search_id(make_get_request):
     url = '/genre/search/'
@@ -73,4 +73,5 @@ async def test_genre_search_id(make_get_request):
     response = await make_get_request(url, query)
     assert response.status == 200
     assert len(response.body) == 1
-    assert {"id": "9c3ca691-ab36-4b69-8e19-9ec73022f40c", "title": "Mystery", "movies": []} in response.body
+    assert {"id": "9c3ca691-ab36-4b69-8e19-9ec73022f40c",
+            "title": "Mystery", "movies": []} in response.body
