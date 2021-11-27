@@ -108,6 +108,7 @@ class FilmService:
             self,
             query_str: Optional[str] = None,
             filter_by_genre: Optional[List[str]] = None,
+            filter_by_max_rating: Optional[float] = None,
             sort: Optional[List[str]] = None,
             offset: Optional[int] = 0,
             limit: Optional[int] = 10,
@@ -126,11 +127,18 @@ class FilmService:
             ]
             is_empty_body = False
 
+        filters = []
         if filter_by_genre is not None and len(filter_by_genre) > 0:
-            # case-sensitive
-            query_body['query']['bool']['filter'] = [
-                {'terms': {'genre': filter_by_genre}}
-            ]
+            filters.append({'terms': {'genre': filter_by_genre}})
+            is_empty_body = False
+
+        if filter_by_max_rating is not None:
+            filters.append(
+                {"range": {"imdb_rating": {"lte": filter_by_max_rating}}}
+            )
+
+        if filters:
+            query_body['query']['bool']['filter'] = filters
             is_empty_body = False
 
         if is_empty_body:

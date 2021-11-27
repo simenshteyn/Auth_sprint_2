@@ -14,3 +14,5 @@ ELASTIC_HOST = os.getenv('ELASTIC_HOST', '127.0.0.1')
 ELASTIC_PORT = int(os.getenv('ELASTIC_PORT', 9200))
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+AUTH_SERVICE_USER_ROLES_URL = os.getenv('AUTH_SERVICE_USER_ROLES_URL')
