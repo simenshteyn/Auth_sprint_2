@@ -62,7 +62,8 @@ async def redis_client(settings):
 @pytest.fixture
 def make_get_request(session, settings):
     async def inner(
-        path: str, params: Union[dict, CIMultiDict] = {}, api_ver: str = '1'
+            path: str, params: Union[dict, CIMultiDict] = {},
+            api_ver: str = '1'
     ) -> HTTPResponse:
         url = f'{settings.service_url}/api/v{api_ver}{path}'
         # The following prints will be outputed only for failed tests
@@ -93,6 +94,25 @@ def make_post_request(session):
         #     method=method
         # )
         async with session.post(url, json=json, headers=headers) as response:
+            return HTTPResponse(
+                body=await response.json(),
+                headers=response.headers,
+                status=response.status,
+            )
+
+    return inner
+
+
+@pytest.fixture
+def make_auth_get_request(session, settings):
+    async def inner(
+            path: str, params: Union[dict, CIMultiDict] = {},
+    ) -> HTTPResponse:
+        url = f'http://host.docker.internal:8000/api/v1/{path}'
+        # The following prints will be outputed only for failed tests
+        print(url)
+        pprint(params)
+        async with session.get(url, params=params) as response:
             return HTTPResponse(
                 body=await response.json(),
                 headers=response.headers,

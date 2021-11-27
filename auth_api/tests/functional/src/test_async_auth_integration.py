@@ -2,37 +2,29 @@
 Testing accessing Async API endpoints
 while authenticated against the Auth API
 """
+from http import HTTPStatus
 
-import requests
-from psycopg2._psycopg import cursor
-from redis import Redis
-
-from tests.functional.settings import config
+import pytest
 from tests.functional.utils.db_utils import get_auth_headers
 
 
-class TestAsyncAuthIntegration:
-    def test_auth_user_film(self, get_subscriber_token,
-                            pg_curs: cursor,
-                            redis_conn: Redis):
-        """Test that authenticated user having a 'subscriber' role
-        will receive all movies from the film endpoint,
-        and non-subscriber (or not authenticated) users: only movies
-        with IMDB rating less or equal 5.
-        """
+@pytest.mark.asyncio
+async def test_auth_user_film(get_subscriber_token, make_service_get_request):
+    """Test that authenticated user having a 'subscriber' role
+    will receive all movies from the film endpoint,
+    and non-subscriber (or not authenticated) users: only movies
+    with IMDB rating less or equal 5.
+    """
 
-        url = config.async_api_url + "/film?sort=-imdb_rating"
+    access_token = get_subscriber_token
 
-        # Test that with auth headers we get movies with rating above 5.
-        response = requests.request(
-            'GET',
-            url,
-            headers=get_auth_headers(get_subscriber_token)
-        )
-        movies = response.json()
-        assert movies['films'][0]['imdb_rating'] > 5
+    # Test that with auth headers we get movies with rating above 5.
+    response = await make_service_get_request(
+        'film?sort=-imdb_rating', headers=get_auth_headers(access_token))
+    assert response.status == HTTPStatus.OK
+    assert response.body['films'][0]['imdb_rating'] > 5
 
-        # Test that without auth headers we get movies with rating 5 at most.
-        response = requests.request('GET', url)
-        movies = response.json()
-        assert movies['films'][0]['imdb_rating'] <= 5
+    # Test that without auth headers we get movies with rating 5 at most.
+    response = await make_service_get_request('film?sort=-imdb_rating')
+    assert response.status == HTTPStatus.OK
+    assert response.body['films'][0]['imdb_rating'] <= 5

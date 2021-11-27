@@ -236,3 +236,22 @@ async def get_subscriber_token(pg_curs, redis_conn):
     # Remove superuser and superadmin role
     remove_user(pg_curs, user_id=user_uuid)
     remove_role(pg_curs, role_id=role_uuid)
+
+
+@pytest.fixture(scope='session')
+def make_service_get_request(session):
+    async def inner(method: str,
+                    params: dict = None,
+                    headers: dict = None) -> HTTPResponse:
+        params = params or {}
+        headers = headers or {}
+        url = f'{config.async_api_url}/{method}'
+        async with session.get(url,
+                               params=params, headers=headers) as response:
+            return HTTPResponse(
+                body=await response.json(),
+                headers=response.headers,
+                status=response.status,
+            )
+
+    return inner
