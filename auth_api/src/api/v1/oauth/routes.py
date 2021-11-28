@@ -1,7 +1,6 @@
 from http import HTTPStatus
 
 from core.containers import Container
-from core.utils import ServiceException
 from dependency_injector.wiring import Provide, inject
 from flask import Blueprint, jsonify, make_response
 from models.social_accounts import SocialSignupResult
@@ -29,11 +28,7 @@ def oauth_authorize(
 def oauth_callback(
         provider: str,
         oauth_service: OauthService = Provide[Container.oauth_service]):
-    try:
-        access_token, refresh_token = oauth_service.login(provider)
-    except ServiceException as err:
-        return make_response(jsonify(err), HTTPStatus.BAD_REQUEST)
-
+    access_token, refresh_token = oauth_service.login(provider)
     return make_response(
         jsonify(access_token=access_token, refresh_token=refresh_token),
         HTTPStatus.OK)
@@ -53,21 +48,16 @@ def oauth_signup_callback(
         provider: str,
         oauth_service: OauthService = Provide[Container.oauth_service],
         user_service: UserService = Provide[Container.user_service]):
-    try:
-        # access_token, refresh_token = oauth_service.signup(provider,
-        #                                                    user_service)
-        result = oauth_service.signup(provider, user_service)
-        if isinstance(result, SocialSignupResult):
-            return make_response(
-                jsonify(access_token=result.access_token,
-                        refresh_token=result.refresh_token,
-                        username=result.username,
-                        password=result.password,
-                        email=result.email),
-                HTTPStatus.OK)
-        access_token, refresh_token = result
-    except ServiceException as err:
-        return make_response(jsonify(err), HTTPStatus.BAD_REQUEST)
+    result = oauth_service.signup(provider, user_service)
+    if isinstance(result, SocialSignupResult):
+        return make_response(
+            jsonify(access_token=result.access_token,
+                    refresh_token=result.refresh_token,
+                    username=result.username,
+                    password=result.password,
+                    email=result.email),
+            HTTPStatus.OK)
+    access_token, refresh_token = result
     return make_response(
         jsonify(access_token=access_token, refresh_token=refresh_token),
         HTTPStatus.OK)

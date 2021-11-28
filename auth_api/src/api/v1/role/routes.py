@@ -2,7 +2,7 @@ from http import HTTPStatus
 
 from core.containers import Container
 from core.settings import config
-from core.utils import ServiceException, authenticate, rate_limit
+from core.utils import authenticate, rate_limit
 from dependency_injector.wiring import Provide, inject
 from flask import Blueprint, Response, jsonify, make_response, request
 from flask_jwt_extended import jwt_required
@@ -20,11 +20,8 @@ role = Blueprint('role', __name__, url_prefix='/role')
 def get_roles(
         user_id: str,
         role_service: RoleService = Provide[Container.role_service]):
-    try:
-        role_service.check_superuser_authorization(user_id)
-        role_list = role_service.get_roles_list()
-    except ServiceException as err:
-        return make_response(jsonify(err), HTTPStatus.BAD_REQUEST)
+    role_service.check_superuser_authorization(user_id)
+    role_list = role_service.get_roles_list()
     result = [{'uuid': role.role_id,
                'role_name': role.role_name} for role in role_list]
     return jsonify(result)
@@ -41,12 +38,8 @@ def create_role(
     create_request = role_service.validate_role_request(request)
     if isinstance(create_request, Response):
         return create_request
-    try:
-        role_service.check_superuser_authorization(user_id)
-        new_role = role_service.create_role(create_request.role_name)
-    except ServiceException as err:
-        return make_response(jsonify(err), HTTPStatus.BAD_REQUEST)
-
+    role_service.check_superuser_authorization(user_id)
+    new_role = role_service.create_role(create_request.role_name)
     return make_response(
         jsonify(uuid=new_role.role_id, role_name=new_role.role_name),
         HTTPStatus.OK
@@ -63,15 +56,11 @@ def edit_role(user_id: str, role_uuid: str,
     edit_request = role_service.validate_role_request(request)
     if isinstance(edit_request, Response):
         return edit_request
-    try:
-        role_service.check_superuser_authorization(user_id)
-        edited_role = role_service.edit_role(
-            role_id=role_uuid,
-            role_name=edit_request.role_name
-        )
-    except ServiceException as err:
-        return make_response(jsonify(err), HTTPStatus.BAD_REQUEST)
-
+    role_service.check_superuser_authorization(user_id)
+    edited_role = role_service.edit_role(
+        role_id=role_uuid,
+        role_name=edit_request.role_name
+    )
     return make_response(
         jsonify(uuid=edited_role.role_id, role_name=edited_role.role_name),
         HTTPStatus.OK
@@ -85,11 +74,8 @@ def edit_role(user_id: str, role_uuid: str,
 @inject
 def delete_role(user_id: str, role_uuid: str,
                 role_service: RoleService = Provide[Container.role_service]):
-    try:
-        role_service.check_superuser_authorization(user_id)
-        deleted_role = role_service.delete_role(role_id=role_uuid)
-    except ServiceException as err:
-        return make_response(jsonify(err), HTTPStatus.BAD_REQUEST)
+    role_service.check_superuser_authorization(user_id)
+    deleted_role = role_service.delete_role(role_id=role_uuid)
     return make_response(
         jsonify(uuid=deleted_role.role_id, role_name=deleted_role.role_name),
         HTTPStatus.OK
@@ -105,11 +91,8 @@ def get_role_permissions(
         user_id: str,
         role_uuid: str,
         role_service: RoleService = Provide[Container.role_service]):
-    try:
-        role_service.check_superuser_authorization(user_id)
-        perm_list = role_service.get_role_permissions(role_uuid)
-    except ServiceException as err:
-        return make_response(jsonify(err), HTTPStatus.BAD_REQUEST)
+    role_service.check_superuser_authorization(user_id)
+    perm_list = role_service.get_role_permissions(role_uuid)
     result = [{'uuid': perm.permission_id,
                'permission_name': perm.permission_name} for perm in perm_list]
     return jsonify(result)
@@ -127,13 +110,10 @@ def set_role_permissions(
     set_request = role_service.validate_perm_request(request)
     if isinstance(set_request, Response):
         return set_request
-    try:
-        role_service.check_superuser_authorization(user_id)
-        new_perm: Permission = role_service.set_role_permissions(
-            role_id=role_uuid,
-            perm_id=set_request.permission_uuid)
-    except ServiceException as err:
-        return make_response(jsonify(err), HTTPStatus.BAD_REQUEST)
+    role_service.check_superuser_authorization(user_id)
+    new_perm: Permission = role_service.set_role_permissions(
+        role_id=role_uuid,
+        perm_id=set_request.permission_uuid)
     return make_response(
         jsonify(uuid=new_perm.permission_id,
                 permission_name=new_perm.permission_name),
@@ -152,14 +132,11 @@ def remove_role_permissions(
         role_uuid: str,
         perm_uuid: str,
         role_service: RoleService = Provide[Container.role_service]):
-    try:
-        role_service.check_superuser_authorization(user_id)
-        deleted_perm: Permission = role_service.remove_role_permissions(
-            role_id=role_uuid,
-            perm_id=perm_uuid
-        )
-    except ServiceException as err:
-        return make_response(jsonify(err), HTTPStatus.BAD_REQUEST)
+    role_service.check_superuser_authorization(user_id)
+    deleted_perm: Permission = role_service.remove_role_permissions(
+        role_id=role_uuid,
+        perm_id=perm_uuid
+    )
     return make_response(
         jsonify(uuid=deleted_perm.permission_id,
                 permission_name=deleted_perm.permission_name),
