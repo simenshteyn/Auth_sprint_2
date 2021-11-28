@@ -1,8 +1,13 @@
+from http import HTTPStatus
+
+from flask import make_response, jsonify
+
 from api.common import api
 from core.commands import commands
 from core.containers import Container
 from core.settings import config
 from core.tracer import tracer
+from core.utils import ServiceException
 from db.pg import PG_URI, db
 from flask_jwt_extended import JWTManager
 
@@ -35,4 +40,9 @@ def create_app():
 
 if __name__ == '__main__':
     application = create_app()
+
+    @application.errorhandler(ServiceException)
+    def exceptions(err: ServiceException):
+        return make_response(jsonify(err), HTTPStatus.BAD_REQUEST)
+
     application.run(host="0.0.0.0", port=8000, debug=True)
