@@ -2,14 +2,17 @@ from typing import List, Optional
 
 import aiohttp
 from aiohttp import ClientConnectionError
-from core.config import AUTH_SERVICE_USER_ROLES_URL
+from core.config import AUTH_SERVICE_USER_ROLES_URL, LIMITATION_MAX_RATING
 from fastapi import APIRouter, Depends, HTTPException, Query, Request, status
 from fastapi.logger import logger as log
+
+from core.utils import AuthUser, get_auth_user
 from models.film import Film as FilmData
 from pydantic import BaseModel
 from services.film import FilmService, get_film_service
 
 FILM_NOT_FOUND = 'Film not found'
+FILM_NOT_ALLOWED = 'Please subscribe to see this film'
 
 router = APIRouter()
 
@@ -112,6 +115,7 @@ async def get_film_details(
             description='Film ID (UUID)',
         ),
         film_service: FilmService = Depends(get_film_service),
+        auth_user: AuthUser = Depends(get_auth_user)
 ) -> Film:
     """
     Detailed info about movie by its ID.\n
@@ -125,12 +129,17 @@ async def get_film_details(
             status_code=status.HTTP_404_NOT_FOUND, detail=FILM_NOT_FOUND
         )
 
+    if not auth_user or not auth_user.is_subscriber():
+        if film.imdb_rating > LIMITATION_MAX_RATING:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN, detail=FILM_NOT_ALLOWED
+            )
+
     return _create_response_model(film)
 
 
 @router.get('/', response_model=FilmList)
 async def get_film_list(
-        request: Request,
         filter_by_genre: Optional[List[str]] = Query(
             None,
             description='Genre name. This parameter can be repeated.',
@@ -151,7 +160,8 @@ async def get_film_list(
             description="""Data rows per page.
         Page may contain less rows than requested (for last or single page)""",
         ),
-        film_service: FilmService = Depends(get_film_service)
+        film_service: FilmService = Depends(get_film_service),
+        auth_user: AuthUser = Depends(get_auth_user)
 ):
     """
     Paginated list of movies.\n
@@ -160,28 +170,11 @@ async def get_film_list(
     Filtered list: ".../film?filter[genre]=Comedy&filter[genre]=Drama" (boolean OR)
     """
 
-    auth_header = request.headers.get('Authorization')
-    is_subscriber = False
+    filter_by_max_rating = LIMITATION_MAX_RATING
 
-    if auth_header:
-        headers = {
-            'Authorization': auth_header
-        }
-
-        try:
-            async with aiohttp.ClientSession(headers=headers) as session:
-                async with session.get(AUTH_SERVICE_USER_ROLES_URL,
-                                       timeout=3) as resp:
-                    print(resp.status)
-                    roles = await resp.json()
-                    for role in roles:
-                        if role['role_name'] == 'subscriber':
-                            is_subscriber = True
-        except ClientConnectionError:
-            # Graceful degradation
-            is_subscriber = False
-
-    filter_by_max_rating = None if is_subscriber else 5
+    # Remove the limitation for subscribers
+    if auth_user and auth_user.is_subscriber():
+        filter_by_max_rating = None
 
     docs, docs_found = await film_service.get_list(
         filter_by_genre=filter_by_genre,

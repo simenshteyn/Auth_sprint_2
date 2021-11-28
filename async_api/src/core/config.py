@@ -16,3 +16,5 @@ ELASTIC_PORT = int(os.getenv('ELASTIC_PORT', 9200))
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 AUTH_SERVICE_USER_ROLES_URL = os.getenv('AUTH_SERVICE_USER_ROLES_URL')
+
+LIMITATION_MAX_RATING = float(os.getenv('LIMITATION_MAX_RATING'))
