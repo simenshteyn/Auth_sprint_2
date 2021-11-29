@@ -33,4 +33,3 @@ async def test_auth_user_film(get_subscriber_token, make_service_get_request):
     # Test that its not possible to get high rating film's details
     response = await make_service_get_request('film/' + high_rating_film_id)
     assert response.status == HTTPStatus.FORBIDDEN
-
