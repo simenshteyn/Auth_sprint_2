@@ -12,6 +12,7 @@ services:
             - REDIS_HOST=redis
             - REDIS_PORT=6379
             - AUTH_SERVICE_USER_ROLES_URL=http://host.docker.internal:8000/api/v1/user/roles
+            - LIMITATION_MAX_RATING=5
         working_dir: /opt/async_api
         command: >
             gunicorn main:app

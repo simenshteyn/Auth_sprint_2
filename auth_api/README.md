@@ -4,7 +4,7 @@
 
 OpenAPI design: `/design/authservice_openapi.yaml`
 
-SwaggerUI (in testing profile): [http://localhost:8081](http://localhost:8080)
+SwaggerUI (in testing profile): [http://localhost:8081](http://localhost:8081)
 
 JaegerUI (in testing profile): [http://localhost:16686](http://localhost:16686/)
 
